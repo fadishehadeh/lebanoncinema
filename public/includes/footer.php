@@ -21,18 +21,21 @@
 
 <!-- Footer -->
 <footer class="footer">
+    <div class="footer-glow"></div>
     <div class="footer-inner">
+        <div class="footer-brand">
+            <h3>Lebanon<span style="color:var(--accent);">Cinema</span></h3>
+            <p>Discover what's playing at cinemas across Lebanon. Showtimes updated daily at 6am.</p>
+        </div>
         <div>
-            <h3>Lebanon Cinema</h3>
-            <p>Discover what's playing at cinemas across Lebanon. Showtimes updated daily.</p>
-            <br>
+            <h4>Browse</h4>
             <a href="<?= _link('/') ?>">Today's Showtimes</a>
             <a href="<?= _link('/movies') ?>">All Movies</a>
             <a href="<?= _link('/cinemas') ?>">All Cinemas</a>
             <a href="<?= _link('/coming-soon') ?>">Coming Soon</a>
         </div>
         <div>
-            <h3>Chains</h3>
+            <h4>Cinema Chains</h4>
             <a href="<?= _link('/cinemas') ?>">VOX Cinemas</a>
             <a href="<?= _link('/cinemas') ?>">Grand Cinemas</a>
             <a href="<?= _link('/cinemas') ?>">Empire Cinemas</a>
@@ -41,7 +44,7 @@
             <a href="<?= _link('/cinemas') ?>">Stargate</a>
         </div>
         <div>
-            <h3>Genres</h3>
+            <h4>Genres</h4>
             <a href="<?= _link('/movies?genre=Action') ?>">Action</a>
             <a href="<?= _link('/movies?genre=Comedy') ?>">Comedy</a>
             <a href="<?= _link('/movies?genre=Drama') ?>">Drama</a>
@@ -51,7 +54,7 @@
         </div>
     </div>
     <div class="footer-bottom">
-        &copy; <?= date('Y') ?> <?= SITE_NAME ?>. All rights reserved.
+        <p>&copy; <?= date('Y') ?> <?= SITE_NAME ?>. All rights reserved.</p>
     </div>
 </footer>
 

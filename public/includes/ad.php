@@ -55,9 +55,9 @@ function renderAdPlaceholder(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?> { margin:0 auto; }
-    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-md); background:linear-gradient(180deg,rgba(94,139,255,0.05) 0%,var(--card) 100%); border:1px solid rgba(94,139,255,0.12); overflow:hidden; transition:border-color .2s; }
-    #<?= $id ?> .ad-inner:hover { border-color:rgba(94,139,255,0.3); box-shadow:0 0 20px rgba(94,139,255,0.08); }
-    #<?= $id ?> .ad-label { position:absolute; top:6px; left:10px; font-size:.55rem; text-transform:uppercase; letter-spacing:.1em; color:#5E8BFF; opacity:.5; font-weight:700; }
+    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(94,139,255,0.04) 0%, var(--surface2) 50%, var(--card) 100%); border:1px solid rgba(94,139,255,0.06); overflow:hidden; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    #<?= $id ?> .ad-inner:hover { border-color:rgba(94,139,255,0.15); box-shadow:0 0 30px rgba(94,139,255,0.06); }
+    #<?= $id ?> .ad-label { position:absolute; top:6px; left:10px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-blue); opacity:.45; font-weight:700; font-family:'Inter',sans-serif; }
     #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--text-muted); opacity:.2; font-size:.7rem; }
     #<?= $id ?> .ad-skelly svg { opacity:.4; }
     #<?= $id ?> .ad-leaderboard { width:100%; min-height:90px; padding:24px; }
@@ -102,9 +102,9 @@ function renderAdsenseAd(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?>-wrap { margin:0 auto; }
-    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-md); background:linear-gradient(180deg,rgba(94,139,255,0.05) 0%,var(--card) 100%); border:1px solid rgba(94,139,255,0.12); overflow:hidden; min-height:50px; }
-    #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(94,139,255,0.3); }
-    #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.1em; color:#5E8BFF; opacity:.45; font-weight:700; z-index:1; }
+    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(94,139,255,0.04) 0%, var(--surface2) 50%, var(--card) 100%); border:1px solid rgba(94,139,255,0.06); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(94,139,255,0.15); box-shadow:0 0 30px rgba(94,139,255,0.06); }
+    #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent-blue); opacity:.4; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
     .ad-leaderboard { width:100%; min-height:90px; }
     .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; margin:0 auto; }
     .ad-rectangle { width:100%; max-width:336px; min-height:250px; margin:0 auto; }

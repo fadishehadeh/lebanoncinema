@@ -69,25 +69,31 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            DESIGN TOKENS
            ══════════════════════════════════════════════════ */
         :root {
-            --bg:          #0B0B0F;
-            --surface:     #15151B;
-            --card:        #1B1B22;
-            --card-hover:  #22222A;
-            --border:      rgba(255,255,255,0.06);
-            --border-strong: rgba(255,255,255,0.12);
-            --text:        #FFFFFF;
-            --text-muted:  #888;
-            --accent:      #FF3D71;
+            --bg:          #07070A;
+            --bg-alt:      #0A0C12;
+            --surface:     #0F1117;
+            --surface2:    #131722;
+            --card:        #151A24;
+            --card-hover:  #1A202E;
+            --border:      rgba(255,255,255,0.04);
+            --border-strong: rgba(255,255,255,0.08);
+            --text:        #F0F0F2;
+            --text-muted:  #787C85;
+            --accent:      #FF2D6F;
             --accent-blue: #5E8BFF;
-            --accent-glow: rgba(255,61,113,0.3);
-            --blue-glow:   rgba(94,139,255,0.25);
-            --radius-sm:   8px;
-            --radius-md:   14px;
-            --radius-lg:   20px;
-            --radius-xl:   28px;
-            --shadow-card: 0 8px 32px rgba(0,0,0,0.5);
-            --shadow-glow: 0 0 40px rgba(255,61,113,0.15);
+            --accent-purple: #7B5EA7;
+            --accent-glow: rgba(255,45,111,0.25);
+            --blue-glow:   rgba(94,139,255,0.18);
+            --purple-glow: rgba(123,94,167,0.15);
+            --radius-sm:   6px;
+            --radius-md:   12px;
+            --radius-lg:   18px;
+            --radius-xl:   24px;
+            --shadow-card: 0 12px 48px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 50px rgba(255,45,111,0.12);
+            --shadow-blue:  0 0 50px rgba(94,139,255,0.08);
             --ease:        cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
             --nav-height:  64px;
             --bottom-nav-height: 64px;
         }
@@ -104,6 +110,12 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             padding-top: var(--nav-height);
             padding-bottom: var(--bottom-nav-height);
             overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123,94,167,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,45,111,0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 60% at 20% 60%, rgba(94,139,255,0.03) 0%, transparent 50%),
+                radial-gradient(ellipse 100% 30% at 50% 110%, rgba(123,94,167,0.06) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
         h1, h2, h3, h4 {
@@ -127,10 +139,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             align-items: center;
             justify-content: space-between;
             padding: 0 24px;
-            background: rgba(11,11,15,0.8);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid var(--border);
+            background: rgba(7,7,10,0.75);
+            backdrop-filter: blur(32px);
+            -webkit-backdrop-filter: blur(32px);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
         }
 
         .brand {
@@ -142,6 +154,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             -webkit-text-fill-color: transparent;
             background-clip: text;
             letter-spacing: -0.03em;
+            position: relative;
         }
 
         .nav-links {
@@ -200,11 +213,20 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .hero {
             position: relative;
             width: 100%;
-            min-height: 70vh;
+            min-height: 75vh;
             display: flex;
             align-items: center;
             overflow: hidden;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 50% at 30% 50%, rgba(255,45,111,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse 40% 40% at 70% 30%, rgba(94,139,255,0.06) 0%, transparent 50%);
+            z-index: 1;
+            pointer-events: none;
         }
 
         .hero-backdrop {
@@ -216,39 +238,57 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             width: 100%;
             height: 100%;
             object-fit: cover;
+            animation: heroZoom 20s var(--ease-smooth) infinite alternate;
+        }
+        @keyframes heroZoom {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
         }
         .hero-backdrop::after {
             content: '';
             position: absolute;
             inset: 0;
             background: linear-gradient(135deg,
-                rgba(11,11,15,0.92) 0%,
-                rgba(11,11,15,0.7) 40%,
-                rgba(11,11,15,0.4) 70%,
-                rgba(11,11,15,0.9) 100%
+                rgba(7,7,10,0.92) 0%,
+                rgba(7,7,10,0.6) 35%,
+                rgba(7,7,10,0.25) 55%,
+                rgba(7,7,10,0.7) 75%,
+                rgba(7,7,10,0.9) 100%
             );
         }
 
         .hero-content {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             display: flex;
             align-items: center;
-            gap: 48px;
+            gap: 56px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 60px 24px;
+            padding: 60px 32px;
             width: 100%;
         }
 
         .hero-poster {
             flex-shrink: 0;
-            width: 220px;
-            border-radius: var(--radius-lg);
+            width: 230px;
+            border-radius: var(--radius-xl);
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px var(--accent-glow);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 60px var(--accent-glow);
             transform: translateY(0);
             animation: float 6s var(--ease) infinite;
+            transition: transform 0.4s var(--ease);
+        }
+        .hero-poster:hover {
+            transform: scale(1.03);
+        }
+        .hero-poster::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-xl);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
+            pointer-events: none;
         }
         .hero-poster img {
             width: 100%;
@@ -258,7 +298,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-10px); }
         }
 
         .hero-info { flex: 1; min-width: 0; }
@@ -268,36 +308,38 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             align-items: center;
             gap: 6px;
             padding: 6px 14px;
-            background: rgba(255,61,113,0.15);
-            border: 1px solid rgba(255,61,113,0.3);
+            background: rgba(255,45,111,0.12);
+            border: 1px solid rgba(255,45,111,0.25);
             border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            font-size: 0.65rem;
+            font-weight: 700;
             color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-bottom: 16px;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+            backdrop-filter: blur(8px);
         }
 
         .hero-title {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            letter-spacing: -0.02em;
+            font-size: 3.2rem;
+            margin-bottom: 14px;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
         }
 
         .hero-tagline {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
-            max-width: 500px;
-            line-height: 1.5;
+            margin-bottom: 24px;
+            max-width: 520px;
+            line-height: 1.6;
         }
 
         .hero-meta {
             display: flex;
             gap: 20px;
             align-items: center;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             font-size: 0.85rem;
             color: var(--text-muted);
             flex-wrap: wrap;
@@ -308,15 +350,15 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             gap: 6px;
         }
         .hero-meta .dot {
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             border-radius: 50%;
             background: var(--text-muted);
         }
 
         .hero-ctas {
             display: flex;
-            gap: 12px;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
@@ -324,64 +366,73 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 28px;
+            padding: 14px 32px;
             border-radius: var(--radius-md);
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.25s var(--ease);
+            transition: all 0.3s var(--ease);
             border: none;
             font-family: inherit;
+            letter-spacing: 0.01em;
         }
         .btn svg { width: 18px; height: 18px; }
 
         .btn-primary {
             background: var(--accent);
             color: #000;
+            box-shadow: 0 4px 20px rgba(255,45,111,0.3);
         }
         .btn-primary:hover {
-            background: #ff2460;
-            box-shadow: var(--shadow-glow);
+            background: #ff1a5c;
+            box-shadow: 0 6px 30px rgba(255,45,111,0.45);
+            transform: translateY(-2px);
             color: #000;
         }
 
         .btn-outline {
-            background: transparent;
-            border: 1.5px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.15);
             color: var(--text);
+            backdrop-filter: blur(8px);
         }
         .btn-outline:hover {
             border-color: var(--accent);
             color: var(--accent);
-            background: rgba(255,61,113,0.08);
+            background: rgba(255,45,111,0.08);
+            box-shadow: 0 0 30px rgba(255,45,111,0.1);
         }
 
         .hero-quick-times {
-            margin-top: 20px;
+            margin-top: 24px;
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
         }
         .hero-quick-times .label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
+            font-weight: 600;
         }
         .hero-time-chip {
-            padding: 6px 14px;
+            padding: 7px 16px;
             border-radius: 20px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
             font-size: 0.8rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.25s var(--ease);
             cursor: pointer;
+            color: var(--text);
+            backdrop-filter: blur(4px);
         }
         .hero-time-chip:hover {
             border-color: var(--accent);
-            background: rgba(255,61,113,0.1);
+            background: rgba(255,45,111,0.12);
+            box-shadow: 0 0 20px rgba(255,45,111,0.1);
         }
 
         .hero-search-fallback {
@@ -552,20 +603,44 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            SECTION / CAROUSEL
            ══════════════════════════════════════════════════ */
         .section {
-            margin-bottom: 48px;
+            margin-bottom: 56px;
+            position: relative;
         }
+        .section::before {
+            content: '';
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,45,111,0.06), rgba(94,139,255,0.06), transparent);
+        }
+        .section:first-of-type::before { display: none; }
 
         .section-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             padding: 0 24px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .section-title {
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-right: 10px;
+            vertical-align: middle;
         }
 
         .section-link {
@@ -573,6 +648,9 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             color: var(--text-muted);
             font-weight: 500;
             transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .section-link:hover { color: var(--accent); }
 
@@ -618,8 +696,116 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             background: var(--card);
             scroll-snap-align: start;
             cursor: pointer;
-            transition: all 0.3s var(--ease);
-            border: 1px solid transparent;
+            transition: all 0.4s var(--ease);
+            border: 1px solid rgba(255,255,255,0.03);
+            will-change: transform;
+        }
+        .poster-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-md);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.06);
+            pointer-events: none;
+            z-index: 4;
+        }
+        .poster-card:hover {
+            border-color: rgba(255,45,111,0.2);
+            transform: translateY(-6px) scale(1.03);
+            box-shadow: 0 16px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,45,111,0.08);
+        }
+
+        .poster-card-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s var(--ease);
+        }
+        .poster-card:hover .poster-card-img {
+            transform: scale(1.08);
+        }
+
+        .poster-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top,
+                rgba(7,7,10,0.95) 0%,
+                rgba(7,7,10,0.4) 40%,
+                rgba(7,7,10,0.1) 65%,
+                transparent 80%
+            );
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 14px;
+            opacity: 0;
+            transition: opacity 0.35s var(--ease);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .poster-card:hover .poster-card-overlay {
+            opacity: 1;
+        }
+        .poster-card-overlay .poster-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .poster-card-overlay .poster-card-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .default-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top,
+                rgba(7,7,10,0.92) 0%,
+                rgba(7,7,10,0.15) 50%,
+                transparent 75%
+            );
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 14px;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .default-overlay .poster-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .default-overlay .poster-card-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .poster-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .poster-card-meta {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .poster-card-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            z-index: 3;
+            backdrop-filter: blur(4px);
         }
         .poster-card:hover {
             border-color: var(--border-strong);
@@ -748,16 +934,16 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             width: 280px;
             padding: 20px;
             border-radius: var(--radius-lg);
-            background: var(--card);
-            border: 1px solid var(--border);
-            transition: all 0.3s var(--ease);
+            background: linear-gradient(135deg, var(--card) 0%, var(--surface2) 100%);
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: all 0.35s var(--ease);
             cursor: pointer;
             scroll-snap-align: start;
         }
         .cinema-card:hover {
-            border-color: var(--border-strong);
+            border-color: rgba(94,139,255,0.15);
             transform: translateY(-4px);
-            box-shadow: var(--shadow-card);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(94,139,255,0.06);
         }
 
         .cinema-card-top {
@@ -821,22 +1007,22 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             overflow: hidden;
             background: var(--card);
             cursor: pointer;
-            transition: all 0.3s var(--ease);
-            border: 1px solid var(--border);
+            transition: all 0.35s var(--ease);
+            border: 1px solid rgba(255,255,255,0.03);
         }
         .wall-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-card);
-            border-color: var(--border-strong);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(255,45,111,0.06);
+            border-color: rgba(255,45,111,0.12);
         }
         .wall-card img {
             width: 100%;
             aspect-ratio: 2/3;
             object-fit: cover;
             display: block;
-            transition: transform 0.4s var(--ease);
+            transition: transform 0.5s var(--ease);
         }
-        .wall-card:hover img { transform: scale(1.05); }
+        .wall-card:hover img { transform: scale(1.06); }
         .wall-card-info {
             padding: 10px 12px;
         }
@@ -1186,41 +1372,68 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            FOOTER
            ══════════════════════════════════════════════════ */
         .footer {
-            border-top: 1px solid var(--border);
-            padding: 48px 24px 24px;
-            margin-top: 48px;
+            position: relative;
+            padding: 56px 24px 24px;
+            margin-top: 64px;
+            background: linear-gradient(180deg, rgba(7,7,10,0) 0%, rgba(15,17,23,0.95) 30%, rgba(7,7,10,1) 100%);
+            border-top: 1px solid rgba(255,255,255,0.03);
+            overflow: hidden;
+        }
+        .footer-glow {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            height: 120px;
+            background: radial-gradient(ellipse, rgba(255,45,111,0.06) 0%, transparent 70%);
+            pointer-events: none;
         }
         .footer-inner {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            position: relative;
+            z-index: 1;
         }
         .footer h3 {
-            font-size: 0.85rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .footer h4 {
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             color: var(--text-muted);
             margin-bottom: 16px;
+            font-weight: 600;
         }
         .footer a {
             display: block;
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             transition: color 0.2s;
         }
         .footer a:hover { color: var(--accent); }
-        .footer p { color: var(--text-muted); font-size: 0.8rem; }
+        .footer p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; }
+        .footer-brand p { margin-top: 8px; }
         .footer-bottom {
             max-width: 1200px;
-            margin: 32px auto 0;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
+            margin: 40px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.04);
             text-align: center;
             color: var(--text-muted);
             font-size: 0.75rem;
+            position: relative;
+            z-index: 1;
         }
 
         /* ══════════════════════════════════════════════════
@@ -1440,6 +1653,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .detail-ctas { justify-content: center; }
             .cinema-detail-hero { flex-direction: column; }
             .cinema-detail-stats { text-align: left; margin-top: 16px; }
+            .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
         }
 
         @media (max-width: 768px) {
