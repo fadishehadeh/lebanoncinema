@@ -595,6 +595,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             position: relative;
             flex-shrink: 0;
             width: 160px;
+            aspect-ratio: 2/3;
             border-radius: var(--radius-md);
             overflow: hidden;
             background: var(--card);
@@ -610,8 +611,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
 
         .poster-card-img {
+            position: absolute;
+            inset: 0;
             width: 100%;
-            aspect-ratio: 2/3;
+            height: 100%;
             object-fit: cover;
             display: block;
             transition: transform 0.4s var(--ease);
@@ -634,6 +637,8 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             padding: 14px;
             opacity: 0;
             transition: opacity 0.3s var(--ease);
+            z-index: 2;
+            pointer-events: none;
         }
         .poster-card:hover .poster-card-overlay {
             opacity: 1;
@@ -651,6 +656,8 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             flex-direction: column;
             justify-content: flex-end;
             padding: 14px;
+            z-index: 1;
+            pointer-events: none;
         }
 
         .poster-card-title {
@@ -669,6 +676,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             right: 10px;
             padding: 4px 10px;
             border-radius: 6px;
+            z-index: 3;
             font-size: 0.6rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -840,6 +848,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 
         .movie-grid .poster-card {
             width: 100%;
+            aspect-ratio: 2/3;
         }
 
         .movie-grid .poster-card .default-overlay {
