@@ -21,7 +21,6 @@
 
 <!-- Footer -->
 <footer class="footer">
-    <div class="footer-glow"></div>
     <div class="footer-inner">
         <div class="footer-brand">
             <h3>Lebanon<span style="color:var(--accent);">Cinema</span></h3>
@@ -75,6 +74,15 @@ document.addEventListener('DOMContentLoaded', () => {
 <?php endif; ?>
 
 <script>
+// Navbar scroll effect
+const nav = document.querySelector('.topnav');
+if (nav) {
+    window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 100);
+    });
+    if (window.scrollY > 100) nav.classList.add('scrolled');
+}
+
 // Lucide icons
 lucide.createIcons();
 

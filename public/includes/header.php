@@ -69,32 +69,28 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            DESIGN TOKENS
            ══════════════════════════════════════════════════ */
         :root {
-            --bg:          #07070A;
-            --bg-alt:      #0A0C12;
-            --surface:     #0F1117;
-            --surface2:    #131722;
-            --card:        #151A24;
-            --card-hover:  #1A202E;
-            --border:      rgba(255,255,255,0.04);
-            --border-strong: rgba(255,255,255,0.08);
-            --text:        #F0F0F2;
-            --text-muted:  #787C85;
-            --accent:      #FF2D6F;
+            --bg:          #050505;
+            --bg-alt:      #0B0B0B;
+            --surface:     #0B0B0B;
+            --surface2:    #111111;
+            --card:        #111111;
+            --card-hover:  #1A1A1A;
+            --border:      rgba(255,255,255,0.03);
+            --border-strong: rgba(255,255,255,0.06);
+            --text:        #FFFFFF;
+            --text-muted:  #808080;
+            --accent:      #E50914;
             --accent-blue: #5E8BFF;
-            --accent-purple: #7B5EA7;
-            --accent-glow: rgba(255,45,111,0.25);
-            --blue-glow:   rgba(94,139,255,0.18);
-            --purple-glow: rgba(123,94,167,0.15);
-            --radius-sm:   6px;
-            --radius-md:   12px;
-            --radius-lg:   18px;
-            --radius-xl:   24px;
-            --shadow-card: 0 12px 48px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.3);
-            --shadow-glow: 0 0 50px rgba(255,45,111,0.12);
-            --shadow-blue:  0 0 50px rgba(94,139,255,0.08);
+            --accent-glow: rgba(229,9,20,0.3);
+            --blue-glow:   rgba(94,139,255,0.15);
+            --radius-sm:   4px;
+            --radius-md:   8px;
+            --radius-lg:   12px;
+            --radius-xl:   16px;
+            --shadow-card: 0 8px 30px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(229,9,20,0.15);
             --ease:        cubic-bezier(0.4, 0, 0.2, 1);
-            --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
-            --nav-height:  64px;
+            --nav-height:  68px;
             --bottom-nav-height: 64px;
         }
 
@@ -105,17 +101,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             color: var(--text);
             font-family: 'Inter', system-ui, sans-serif;
             font-size: 15px;
-            line-height: 1.6;
+            line-height: 1.5;
             min-height: 100vh;
-            padding-top: var(--nav-height);
             padding-bottom: var(--bottom-nav-height);
             overflow-x: hidden;
-            background-image:
-                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(123,94,167,0.08) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,45,111,0.04) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 60% at 20% 60%, rgba(94,139,255,0.03) 0%, transparent 50%),
-                radial-gradient(ellipse 100% 30% at 50% 110%, rgba(123,94,167,0.06) 0%, transparent 50%);
-            background-attachment: fixed;
         }
 
         h1, h2, h3, h4 {
@@ -138,28 +127,27 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 24px;
-            background: rgba(7,7,10,0.75);
-            backdrop-filter: blur(32px);
-            -webkit-backdrop-filter: blur(32px);
+            padding: 0 48px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            transition: background 0.3s var(--ease);
+        }
+        .topnav.scrolled {
+            background: rgba(5,5,5,0.95);
             border-bottom: 1px solid rgba(255,255,255,0.04);
         }
 
         .brand {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.03em;
-            position: relative;
+            color: var(--accent);
+            letter-spacing: -0.02em;
         }
+        .brand span { color: var(--text); }
 
         .nav-links {
             display: flex;
-            gap: 32px;
+            gap: 24px;
             align-items: center;
             position: absolute;
             left: 50%;
@@ -167,25 +155,13 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
 
         .nav-link {
-            position: relative;
-            color: var(--text-muted);
+            color: #b3b3b3;
             font-size: 0.85rem;
             font-weight: 500;
             transition: color 0.2s;
         }
         .nav-link:hover,
         .nav-link.active { color: var(--text); }
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: var(--accent);
-        }
 
         .nav-right {
             display: flex;
@@ -213,20 +189,12 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .hero {
             position: relative;
             width: 100%;
-            min-height: 75vh;
+            height: 80vh;
+            min-height: 600px;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             overflow: hidden;
-            margin-bottom: 48px;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse 60% 50% at 30% 50%, rgba(255,45,111,0.08) 0%, transparent 60%),
-                        radial-gradient(ellipse 40% 40% at 70% 30%, rgba(94,139,255,0.06) 0%, transparent 50%);
-            z-index: 1;
-            pointer-events: none;
+            margin-bottom: 24px;
         }
 
         .hero-backdrop {
@@ -238,57 +206,33 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             width: 100%;
             height: 100%;
             object-fit: cover;
-            animation: heroZoom 20s var(--ease-smooth) infinite alternate;
-        }
-        @keyframes heroZoom {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.08); }
         }
         .hero-backdrop::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg,
-                rgba(7,7,10,0.92) 0%,
-                rgba(7,7,10,0.6) 35%,
-                rgba(7,7,10,0.25) 55%,
-                rgba(7,7,10,0.7) 75%,
-                rgba(7,7,10,0.9) 100%
-            );
+            background: linear-gradient(90deg, rgba(5,5,5,0.85) 0%, rgba(5,5,5,0.4) 35%, transparent 60%),
+                        linear-gradient(0deg, rgba(5,5,5,1) 0%, rgba(5,5,5,0.2) 40%, transparent 60%);
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
             display: flex;
-            align-items: center;
-            gap: 56px;
-            max-width: 1200px;
+            align-items: flex-end;
+            gap: 48px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 60px 32px;
+            padding: 80px 48px 60px;
             width: 100%;
         }
 
         .hero-poster {
             flex-shrink: 0;
-            width: 230px;
-            border-radius: var(--radius-xl);
+            width: 200px;
+            border-radius: var(--radius-md);
             overflow: hidden;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.7), 0 0 60px var(--accent-glow);
-            transform: translateY(0);
-            animation: float 6s var(--ease) infinite;
-            transition: transform 0.4s var(--ease);
-        }
-        .hero-poster:hover {
-            transform: scale(1.03);
-        }
-        .hero-poster::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: var(--radius-xl);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.08);
-            pointer-events: none;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
         }
         .hero-poster img {
             width: 100%;
@@ -296,157 +240,128 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             aspect-ratio: 2/3;
             object-fit: cover;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
 
-        .hero-info { flex: 1; min-width: 0; }
+        .hero-info { flex: 1; min-width: 0; max-width: 600px; }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 6px 14px;
-            background: rgba(255,45,111,0.12);
-            border: 1px solid rgba(255,45,111,0.25);
-            border-radius: 20px;
+            padding: 4px 12px;
+            background: rgba(229,9,20,0.15);
+            border: 1px solid rgba(229,9,20,0.25);
+            border-radius: 4px;
             font-size: 0.65rem;
             font-weight: 700;
             color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 20px;
-            backdrop-filter: blur(8px);
+            letter-spacing: 0.08em;
+            margin-bottom: 16px;
         }
 
         .hero-title {
-            font-size: 3.2rem;
-            margin-bottom: 14px;
-            letter-spacing: -0.03em;
+            font-size: 3rem;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
             line-height: 1.05;
         }
 
         .hero-tagline {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            max-width: 520px;
-            line-height: 1.6;
+            font-size: 1rem;
+            color: #b3b3b3;
+            margin-bottom: 20px;
+            max-width: 500px;
+            line-height: 1.5;
         }
 
         .hero-meta {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: #b3b3b3;
             flex-wrap: wrap;
         }
-        .hero-meta span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .hero-meta .dot {
-            width: 3px;
-            height: 3px;
-            border-radius: 50%;
-            background: var(--text-muted);
-        }
+        .hero-meta span { display: flex; align-items: center; gap: 6px; }
+        .hero-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: #666; }
 
-        .hero-ctas {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-        }
+        .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 14px 32px;
-            border-radius: var(--radius-md);
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s var(--ease);
+            transition: all 0.2s var(--ease);
             border: none;
             font-family: inherit;
-            letter-spacing: 0.01em;
         }
-        .btn svg { width: 18px; height: 18px; }
+        .btn svg { width: 20px; height: 20px; }
 
         .btn-primary {
             background: var(--accent);
-            color: #000;
-            box-shadow: 0 4px 20px rgba(255,45,111,0.3);
+            color: #fff;
         }
         .btn-primary:hover {
-            background: #ff1a5c;
-            box-shadow: 0 6px 30px rgba(255,45,111,0.45);
-            transform: translateY(-2px);
-            color: #000;
+            background: #f6121d;
+            color: #fff;
         }
 
         .btn-outline {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             color: var(--text);
-            backdrop-filter: blur(8px);
         }
         .btn-outline:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background: rgba(255,45,111,0.08);
-            box-shadow: 0 0 30px rgba(255,45,111,0.1);
+            background: rgba(255,255,255,0.2);
+            color: var(--text);
+            border-color: rgba(255,255,255,0.4);
         }
 
         .hero-quick-times {
-            margin-top: 24px;
+            margin-top: 20px;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
         }
         .hero-quick-times .label {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: #b3b3b3;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             font-weight: 600;
         }
         .hero-time-chip {
-            padding: 7px 16px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
+            padding: 6px 14px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
             font-size: 0.8rem;
             font-weight: 500;
-            transition: all 0.25s var(--ease);
+            transition: all 0.2s;
             cursor: pointer;
             color: var(--text);
-            backdrop-filter: blur(4px);
         }
         .hero-time-chip:hover {
             border-color: var(--accent);
-            background: rgba(255,45,111,0.12);
-            box-shadow: 0 0 20px rgba(255,45,111,0.1);
+            background: rgba(229,9,20,0.08);
         }
 
         .hero-search-fallback {
             text-align: center;
-            padding: 80px 24px;
+            padding: 120px 48px 80px;
             width: 100%;
         }
         .hero-search-fallback h1 {
             font-size: 2.5rem;
             margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text);
         }
         .hero-search-fallback p {
             color: var(--text-muted);
@@ -603,84 +518,50 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            SECTION / CAROUSEL
            ══════════════════════════════════════════════════ */
         .section {
-            margin-bottom: 56px;
+            margin-bottom: 36px;
             position: relative;
         }
-        .section::before {
-            content: '';
-            position: absolute;
-            top: -24px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,45,111,0.06), rgba(94,139,255,0.06), transparent);
-        }
-        .section:first-of-type::before { display: none; }
 
         .section-header {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 0 24px;
-            margin-bottom: 24px;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 48px;
+            margin-bottom: 16px;
+            gap: 16px;
         }
 
         .section-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 1.1rem;
+            font-weight: 600;
             color: var(--text);
-        }
-        .section-title::before {
-            content: '';
-            display: inline-block;
-            width: 3px;
-            height: 18px;
-            background: var(--accent);
-            border-radius: 2px;
-            margin-right: 10px;
-            vertical-align: middle;
+            letter-spacing: -0.01em;
         }
 
         .section-link {
             font-size: 0.8rem;
-            color: var(--text-muted);
-            font-weight: 500;
+            color: #b3b3b3;
+            font-weight: 400;
             transition: color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
-        .section-link:hover { color: var(--accent); }
+        .section-link:hover { color: var(--text); }
 
         .carousel {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             overflow-x: auto;
-            padding: 0 24px 8px;
+            padding: 0 48px 8px;
             scroll-behavior: smooth;
             scroll-snap-type: x mandatory;
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
         .carousel::-webkit-scrollbar { display: none; }
-
-        .carousel-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-            padding: 0 24px;
-        }
-        .carousel-grid .poster-card {
-            width: 100%;
-        }
-        @media (max-width: 480px) {
-            .carousel-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                padding: 0 16px;
-            }
+        .carousel::after {
+            content: '';
+            flex-shrink: 0;
+            width: 48px;
+            height: 1px;
         }
 
         /* ══════════════════════════════════════════════════
@@ -689,30 +570,20 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .poster-card {
             position: relative;
             flex-shrink: 0;
-            width: 160px;
+            width: 200px;
             aspect-ratio: 2/3;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-sm);
             overflow: hidden;
-            background: var(--card);
+            background: #111;
             scroll-snap-align: start;
             cursor: pointer;
-            transition: all 0.4s var(--ease);
-            border: 1px solid rgba(255,255,255,0.03);
-            will-change: transform;
-        }
-        .poster-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: var(--radius-md);
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.06);
-            pointer-events: none;
-            z-index: 4;
+            transition: all 0.3s var(--ease);
+            border: none;
         }
         .poster-card:hover {
-            border-color: rgba(255,45,111,0.2);
-            transform: translateY(-6px) scale(1.03);
-            box-shadow: 0 16px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,45,111,0.08);
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
         .poster-card-img {
@@ -722,27 +593,26 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.5s var(--ease);
+            transition: transform 0.4s var(--ease);
         }
         .poster-card:hover .poster-card-img {
-            transform: scale(1.08);
+            transform: scale(1.06);
         }
 
         .poster-card-overlay {
             position: absolute;
             inset: 0;
             background: linear-gradient(to top,
-                rgba(7,7,10,0.95) 0%,
-                rgba(7,7,10,0.4) 40%,
-                rgba(7,7,10,0.1) 65%,
-                transparent 80%
+                rgba(0,0,0,0.95) 0%,
+                rgba(0,0,0,0.3) 45%,
+                transparent 70%
             );
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 14px;
+            padding: 12px;
             opacity: 0;
-            transition: opacity 0.35s var(--ease);
+            transition: opacity 0.25s var(--ease);
             z-index: 2;
             pointer-events: none;
         }
@@ -753,25 +623,24 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 4px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .poster-card-overlay .poster-card-meta {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: #b3b3b3;
         }
 
         .default-overlay {
             position: absolute;
             inset: 0;
             background: linear-gradient(to top,
-                rgba(7,7,10,0.92) 0%,
-                rgba(7,7,10,0.15) 50%,
-                transparent 75%
+                rgba(0,0,0,0.9) 0%,
+                rgba(0,0,0,0.1) 50%,
+                transparent 70%
             );
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 14px;
+            padding: 12px;
             z-index: 1;
             pointer-events: none;
         }
@@ -779,33 +648,24 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 4px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
         }
         .default-overlay .poster-card-meta {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: #b3b3b3;
         }
 
-        .poster-card-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .poster-card-meta {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
+        .poster-card-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+        .poster-card-meta { font-size: 0.7rem; color: #b3b3b3; }
 
         .poster-card-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 4px 10px;
-            border-radius: 6px;
+            top: 8px;
+            right: 8px;
+            padding: 3px 8px;
+            border-radius: 3px;
             font-size: 0.6rem;
             font-weight: 700;
             z-index: 3;
-            backdrop-filter: blur(4px);
         }
         .poster-card:hover {
             border-color: var(--border-strong);
@@ -1373,67 +1233,49 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            ══════════════════════════════════════════════════ */
         .footer {
             position: relative;
-            padding: 56px 24px 24px;
-            margin-top: 64px;
-            background: linear-gradient(180deg, rgba(7,7,10,0) 0%, rgba(15,17,23,0.95) 30%, rgba(7,7,10,1) 100%);
+            padding: 48px 48px 24px;
+            margin-top: 48px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.8) 100%);
             border-top: 1px solid rgba(255,255,255,0.03);
-            overflow: hidden;
-        }
-        .footer-glow {
-            position: absolute;
-            top: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 600px;
-            height: 120px;
-            background: radial-gradient(ellipse, rgba(255,45,111,0.06) 0%, transparent 70%);
-            pointer-events: none;
         }
         .footer-inner {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.5fr 1fr 1fr 1fr;
-            gap: 40px;
-            position: relative;
-            z-index: 1;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
         }
         .footer h3 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: var(--text);
         }
         .footer h4 {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 16px;
-            font-weight: 600;
+            margin-bottom: 12px;
+            font-weight: 500;
         }
         .footer a {
             display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: #808080;
+            margin-bottom: 8px;
             transition: color 0.2s;
         }
-        .footer a:hover { color: var(--accent); }
-        .footer p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.6; }
+        .footer a:hover { color: var(--text); }
+        .footer p { color: #808080; font-size: 0.8rem; line-height: 1.5; }
         .footer-brand p { margin-top: 8px; }
         .footer-bottom {
             max-width: 1200px;
-            margin: 40px auto 0;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.04);
+            margin: 32px auto 0;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.03);
             text-align: center;
-            color: var(--text-muted);
+            color: #555;
             font-size: 0.75rem;
-            position: relative;
-            z-index: 1;
         }
 
         /* ══════════════════════════════════════════════════
@@ -1637,49 +1479,44 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            RESPONSIVE
            ══════════════════════════════════════════════════ */
         @media (max-width: 900px) {
-            .hero-content { flex-direction: column; text-align: center; padding: 40px 24px; }
-            .hero-poster { width: 160px; }
-            .hero-info { display: flex; flex-direction: column; align-items: center; }
-            .hero-meta { justify-content: center; }
-            .hero-ctas { justify-content: center; }
-            .hero-quick-times { justify-content: center; }
+            .topnav { padding: 0 24px; }
+            .hero-content { padding: 60px 24px 40px; }
+            .hero-poster { width: 140px; }
             .hero-title { font-size: 2rem; }
-            .detail-hero { flex-direction: column; align-items: center; text-align: center; }
-            .detail-poster { width: 200px; }
-            .detail-info { display: flex; flex-direction: column; align-items: center; }
-            .detail-synopsis { text-align: center; }
-            .detail-meta { justify-content: center; }
-            .detail-tags { justify-content: center; }
-            .detail-ctas { justify-content: center; }
-            .cinema-detail-hero { flex-direction: column; }
-            .cinema-detail-stats { text-align: left; margin-top: 16px; }
+            .section-header { padding: 0 24px; }
+            .carousel { padding: 0 24px; }
             .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .footer { padding: 40px 24px 20px; }
         }
 
         @media (max-width: 768px) {
-            body { padding-top: 56px; }
-            .topnav { height: 56px; padding: 0 12px; }
+            body { padding-bottom: var(--bottom-nav-height); }
+            .topnav { height: 56px; padding: 0 16px; }
             .nav-links { display: none; }
             .hamburger { display: flex; }
             .brand { font-size: 1rem; }
-            .hero { min-height: auto; }
+            .hero { height: 60vh; min-height: 400px; margin-bottom: 16px; }
+            .hero-content { padding: 48px 16px 32px; gap: 24px; flex-direction: column; align-items: flex-start; }
+            .hero-poster { width: 120px; display: none; }
             .hero-title { font-size: 1.6rem; }
-            .hero-poster { width: 130px; }
-            .poster-card { width: 140px; }
+            .hero-tagline { font-size: 0.85rem; }
+            .poster-card { width: 160px; }
             .cinema-card { width: 240px; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 0 16px; }
             .poster-wall { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); padding: 0 16px; }
             .section-header { padding: 0 16px; }
-            .carousel { padding: 0 16px; }
-            .chips-row { padding: 0 16px 16px; }
+            .carousel { padding: 0 16px; gap: 6px; }
+            .chips-row { padding: 0 16px 12px; }
             .search-section { padding: 0 16px; }
             .detail-hero { padding: 24px 16px; }
             .detail-title { font-size: 1.6rem; }
             .showtimes-wrap { padding: 0 16px 32px; }
             .cinema-detail-hero { padding: 24px 16px; }
-            .section { margin-bottom: 32px; }
+            .section { margin-bottom: 24px; }
             .hero-search-fallback { padding: 48px 16px; }
             .hero-search-fallback h1 { font-size: 1.6rem; }
+            .footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; }
+            .footer { padding: 32px 16px 16px; }
         }
 
         @media (max-width: 480px) {
@@ -1745,7 +1582,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 <body>
 
 <nav class="topnav">
-    <a class="brand" href="<?= _link('/') ?>">LebanonCinema</a>
+    <a class="brand" href="<?= _link('/') ?>">Lebanon<span>Cinema</span></a>
     <div class="nav-links">
         <a class="nav-link" href="<?= _link('/') ?>">Today</a>
         <a class="nav-link" href="<?= _link('/movies') ?>">Movies</a>
