@@ -564,6 +564,17 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             height: 1px;
         }
 
+        .carousel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 8px;
+            padding: 0 48px;
+        }
+        .carousel-grid .poster-card { width: 100%; }
+        @media (max-width: 768px) {
+            .carousel-grid { padding: 0 16px; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+        }
+
         /* ══════════════════════════════════════════════════
            POSTER CARD
            ══════════════════════════════════════════════════ */
