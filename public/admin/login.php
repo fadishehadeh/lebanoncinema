@@ -8,9 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $_POST['username'] ?? '';
     $pass = $_POST['password'] ?? '';
     if (attemptLogin($user, $pass)) {
-        $redirect = '/admin';
-        if (defined('SITE_URL')) $redirect = rtrim(SITE_URL, '/') . $redirect;
-        header('Location: ' . $redirect);
+        header('Location: /admin');
         exit;
     }
     $error = 'Invalid credentials';

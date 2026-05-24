@@ -8,12 +8,8 @@ function requireAuth(): void {
         session_start();
     }
     if (empty($_SESSION['admin_logged_in'])) {
-        $loginUrl = '/admin/login.php';
-        // If SITE_URL is available, use it; otherwise just use relative path
-        if (defined('SITE_URL')) {
-            $loginUrl = rtrim(SITE_URL, '/') . $loginUrl;
-        }
-        header('Location: ' . $loginUrl);
+        // Use relative path to avoid SITE_URL detection issues with rewrites
+        header('Location: /admin/login.php');
         exit;
     }
 }
