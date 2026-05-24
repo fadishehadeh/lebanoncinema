@@ -60,7 +60,7 @@ function renderAdPlaceholder(string $type, array $options): void {
     #<?= $id ?> .ad-label { position:absolute; top:6px; left:10px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.5; font-weight:700; font-family:'Inter',sans-serif; }
     #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:#fff; opacity:.25; font-size:.7rem; }
     #<?= $id ?> .ad-skelly svg { opacity:.4; }
-    #<?= $id ?> .ad-leaderboard { width:728px; max-width:100%; min-height:90px; padding:24px; }
+    #<?= $id ?> .ad-leaderboard { width:728px; max-width:100%; min-height:28px; padding:4px 24px; margin:0 auto; }
     #<?= $id ?> .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; padding:16px; margin:0 auto; display:block; }
     #<?= $id ?> .ad-rectangle { width:100%; max-width:336px; min-height:250px; padding:24px; margin:0 auto; }
     #<?= $id ?> .ad-large-rectangle { width:100%; max-width:336px; min-height:280px; padding:24px; margin:0 auto; }
@@ -105,7 +105,7 @@ function renderAdsenseAd(string $type, array $options): void {
     #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg);     background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
     #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
     #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.45; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
-    .ad-leaderboard { width:728px; max-width:100%; min-height:90px; }
+    .ad-leaderboard { width:728px; max-width:100%; min-height:28px; margin:0 auto; }
     .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; margin:0 auto; }
     .ad-rectangle { width:100%; max-width:336px; min-height:250px; margin:0 auto; }
     .ad-large-rectangle { width:100%; max-width:336px; min-height:280px; margin:0 auto; }
