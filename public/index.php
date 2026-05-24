@@ -312,7 +312,7 @@ include __DIR__ . '/includes/header.php';
     </div>
     <div class="cinema-scroll stagger">
         <?php foreach ($cinemas as $c): ?>
-        <a href="<?= e_link('/cinemas/' . rawurlencode($m['slug'])) ?>" class="cinema-card">
+         <a href="<?= e_link('/cinemas/' . rawurlencode($c['slug'])) ?>" class="cinema-card">
             <div class="cinema-card-top">
                 <div class="cinema-dot" style="background:<?= htmlspecialchars($c['color_hex']) ?>"></div>
                 <div class="cinema-card-name"><?= htmlspecialchars($c['name']) ?></div>
