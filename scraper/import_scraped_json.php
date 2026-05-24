@@ -78,6 +78,7 @@ $titleOverrides = [
     'billie eilish   hit me hard and soft the tour' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
     'billie eilish - hit me hard and soft: the tour' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
     'billie eilish: hit me hard and soft (3d)' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
+    'billie eilish: hit me hard and soft' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
     'palestine 36' => 'Palestine 36',
     "palestine '36" => 'Palestine 36',
     'star wars the mandalorian and grogu gc' => 'Star Wars: The Mandalorian and Grogu',
@@ -110,6 +111,7 @@ $titleOverrides = [
 // ─── Statistics ───
 $stats = [
     'matched' => 0,
+    'auto_created' => 0,
     'unmatched_movies' => [],
     'unmatched_locations' => [],
     'inserted' => 0,
@@ -174,8 +176,20 @@ foreach ($movies as $item) {
     $movieId = matchMovie($db, $localMovies, $searchTitle, $normalized, $lookupKey);
 
     if (!$movieId) {
-        $stats['unmatched_movies'][$rawTitle] = ($stats['unmatched_movies'][$rawTitle] ?? 0) + 1;
-        continue;
+        // Auto-create movie if --auto-create flag is set
+        if (in_array('--auto-create', $argv ?? [])) {
+            $movieId = autoCreateMovie($db, $normalized, $searchTitle);
+            if ($movieId) {
+                $stats['auto_created']++;
+                echo "  AUTO-CREATED: $normalized (ID $movieId)\n";
+            } else {
+                $stats['unmatched_movies'][$rawTitle] = ($stats['unmatched_movies'][$rawTitle] ?? 0) + 1;
+                continue;
+            }
+        } else {
+            $stats['unmatched_movies'][$rawTitle] = ($stats['unmatched_movies'][$rawTitle] ?? 0) + 1;
+            continue;
+        }
     }
     $stats['matched']++;
 
@@ -226,6 +240,7 @@ $db->commit();
 echo "\n=== Import Summary ===\n";
 echo "Total records processed: " . count($movies) . "\n";
 echo "Movies matched: {$stats['matched']}\n";
+echo "Auto-created: {$stats['auto_created']}\n";
 echo "Showtimes inserted: {$stats['inserted']}\n";
 echo "Duplicates skipped: {$stats['duplicates']}\n";
 echo "Errors: {$stats['errors']}\n";
@@ -281,4 +296,33 @@ function matchMovie(PDO $db, array $localMovies, string $searchTitle, string $no
     }
 
     return null;
+}
+
+/**
+ * Auto-create a movie record when a scraped movie doesn't match the DB.
+ * Creates a placeholder; admin can later import TMDb data.
+ */
+function autoCreateMovie(PDO $db, string $normalized, string $searchTitle): ?int {
+    // Use the normalized title for the DB
+    $title = ucwords($normalized);
+    // Fix articles
+    $title = preg_replace('/\b(The|A|An)\b/i', ucfirst, $title);
+    
+    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', trim($title)));
+    $slug = trim($slug, '-');
+    
+    // Check for duplicate slug
+    $stmt = $db->prepare("SELECT COUNT(*) FROM movies WHERE slug = ?");
+    $stmt->execute([$slug]);
+    if ((int)$stmt->fetchColumn() > 0) {
+        $slug .= '-' . time();
+    }
+    
+    try {
+        $stmt = $db->prepare("INSERT INTO movies (title, slug, status, is_showing, created_at) VALUES (?, ?, 'now_showing', 1, NOW())");
+        $stmt->execute([$title, $slug]);
+        return (int)$db->lastInsertId();
+    } catch (PDOException $e) {
+        return null;
+    }
 }
