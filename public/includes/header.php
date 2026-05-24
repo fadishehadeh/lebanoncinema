@@ -103,6 +103,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             font-size: 15px;
             line-height: 1.5;
             min-height: 100vh;
+            padding-top: var(--nav-height);
             padding-bottom: var(--bottom-nav-height);
             overflow-x: hidden;
         }
@@ -189,11 +190,12 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .hero {
             position: relative;
             width: 100%;
-            height: 80vh;
-            min-height: 600px;
+            height: calc(80vh + var(--nav-height));
+            min-height: calc(600px + var(--nav-height));
             display: flex;
             align-items: flex-end;
             overflow: hidden;
+            margin-top: calc(var(--nav-height) * -1);
             margin-bottom: 24px;
         }
 
@@ -1523,7 +1525,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .nav-links { display: none; }
             .hamburger { display: flex; }
             .brand { font-size: 1rem; }
-            .hero { height: 60vh; min-height: 400px; margin-bottom: 16px; }
+            .hero { height: calc(60vh + var(--nav-height)); min-height: calc(400px + var(--nav-height)); margin-bottom: 16px; margin-top: calc(var(--nav-height) * -1); }
             .hero-content { padding: 48px 16px 32px; gap: 24px; flex-direction: column; align-items: flex-start; }
             .hero-poster { width: 120px; display: none; }
             .hero-title { font-size: 1.6rem; }

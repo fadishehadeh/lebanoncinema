@@ -227,7 +227,7 @@ include __DIR__ . '/includes/header.php';
         <a href="/movies" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach (array_slice($trending, 0, 8) as $i => $m):
+        <?php foreach (array_slice($trending, 0, 20) as $i => $m):
             $urgency = $m['first_showtime'] ? urgencyLabel(getMinutesUntil($m['first_showtime'])) : null;
         ?>
         <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
@@ -267,7 +267,7 @@ include __DIR__ . '/includes/header.php';
         <h2 class="section-title">Starting Soon</h2>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach (array_slice($startingSoon, 0, 10) as $m):
+        <?php foreach (array_slice($startingSoon, 0, 20) as $m):
             $mins = getMinutesUntil($m['next_showtime']);
             $urgency = urgencyLabel($mins);
         ?>
