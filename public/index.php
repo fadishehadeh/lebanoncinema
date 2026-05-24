@@ -226,10 +226,10 @@ include __DIR__ . '/includes/header.php';
         <h2 class="section-title">Trending Tonight</h2>
         <a href="/movies" class="section-link">See all</a>
     </div>
-    <div class="carousel stagger">
-        <?php foreach ($trending as $i => $m):
+    <div class="carousel-grid stagger">
+        <?php foreach (array_slice($trending, 0, 10) as $i => $m):
             $urgency = $m['first_showtime'] ? urgencyLabel(getMinutesUntil($m['first_showtime'])) : null;
-            // AD PLACEMENT 3: Inline in carousel after every 8th card
+            // AD PLACEMENT 3: Inline after every 8th card
             if ($i > 0 && $i % 8 === 0):
         ?>
             <?php renderAd('in-card', 'ad-inline'); ?>
@@ -270,8 +270,8 @@ include __DIR__ . '/includes/header.php';
     <div class="section-header">
         <h2 class="section-title">Starting Soon</h2>
     </div>
-    <div class="carousel stagger">
-        <?php foreach ($startingSoon as $m):
+    <div class="carousel-grid stagger">
+        <?php foreach (array_slice($startingSoon, 0, 10) as $m):
             $mins = getMinutesUntil($m['next_showtime']);
             $urgency = urgencyLabel($mins);
         ?>
