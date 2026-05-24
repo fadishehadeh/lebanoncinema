@@ -567,16 +567,21 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .carousel-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 16px;
             padding: 0 48px;
-            max-width: 1100px;
         }
         .carousel-grid .poster-card { width: 100%; }
+        @media (min-width: 1400px) {
+            .carousel-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+        }
+        @media (min-width: 1800px) {
+            .carousel-grid { grid-template-columns: repeat(6, 1fr); gap: 20px; }
+        }
         @media (max-width: 900px) {
-            .carousel-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 24px; }
+            .carousel-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0 24px; }
         }
         @media (max-width: 768px) {
-            .carousel-grid { padding: 0 16px; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .carousel-grid { padding: 0 16px; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         }
 
         /* ══════════════════════════════════════════════════
@@ -595,8 +600,8 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             transition: all 0.3s var(--ease);
             border: none;
         }
-        @media (min-width: 1200px) { .poster-card { width: 240px; } }
-        @media (min-width: 1600px) { .poster-card { width: 280px; } }
+        @media (min-width: 1400px) { .poster-card { width: 100%; } }
+        @media (min-width: 1800px) { .poster-card { width: 100%; } }
         .poster-card:hover {
             transform: translateY(-4px) scale(1.04);
             box-shadow: 0 12px 40px rgba(0,0,0,0.6);
