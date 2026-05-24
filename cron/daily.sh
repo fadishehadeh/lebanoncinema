@@ -1,0 +1,44 @@
+#!/bin/bash
+# ============================================
+# LebanonCinema.com Daily Cron Job
+# Add to crontab: 0 6 * * * /path/to/cron/daily.sh
+# ============================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+LOG_FILE="$SCRIPT_DIR/logs/cron_$(date +%Y%m%d).log"
+
+mkdir -p "$SCRIPT_DIR/logs"
+
+echo "==============================" >> "$LOG_FILE"
+echo "Started: $(date)"               >> "$LOG_FILE"
+echo "==============================" >> "$LOG_FILE"
+
+# 0. Run schema migration
+echo "[Schema] Running migration..."  >> "$LOG_FILE"
+php -r "
+    require '$PROJECT_DIR/config.php';
+    runSchemaMigrations(getDbConnection());
+    echo 'Migration completed.\n';
+" >> "$LOG_FILE" 2>&1
+
+# 1. Sync movies from TMDb (now-playing + upcoming)
+echo "[TMDb Sync] Starting..."        >> "$LOG_FILE"
+php "$PROJECT_DIR/scraper/tmdb_sync.php" >> "$LOG_FILE" 2>&1
+
+# 2. Scrape VOX showtimes (7 days)
+echo "[VOX] Starting scrape..."       >> "$LOG_FILE"
+php "$PROJECT_DIR/scraper/vox_scraper.php" 7 >> "$LOG_FILE" 2>&1
+
+# 3. Regenerate sitemap
+echo "[Sitemap] Regenerating..."      >> "$LOG_FILE"
+php -r "
+    require '$PROJECT_DIR/config.php';
+    \$_SERVER['REQUEST_URI'] = '/sitemap.xml';
+    include '$PROJECT_DIR/public/sitemap.php';
+" >> "$LOG_FILE" 2>&1
+
+echo "Finished: $(date)"              >> "$LOG_FILE"
+
+# Keep only last 30 days of logs
+find "$SCRIPT_DIR/logs" -name "cron_*.log" -mtime +30 -delete

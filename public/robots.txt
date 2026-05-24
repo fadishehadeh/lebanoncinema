@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.lebanoncinema.com/sitemap.xml
+
+# Disallow admin or private areas
+Disallow: /includes/
+Disallow: /cron/
+Disallow: /scraper/
+Disallow: /setup_check.php
+Disallow: /test.php
+Disallow: /debug_*
+
+# Crawl budget optimization
+Crawl-Delay: 5

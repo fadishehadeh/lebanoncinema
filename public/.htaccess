@@ -1,0 +1,64 @@
+Options -Indexes
+RewriteEngine On
+RewriteBase /lebanoncinema/public
+
+# SEO & PERFORMANCE HEADERS
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js|woff2?|ttf|otf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|avif|svg)$">
+        Header set Cache-Control "public, max-age=2592000, immutable"
+    </FilesMatch>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/xml
+</IfModule>
+
+# SITEMAP
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+# SEO LANDING PAGES
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^genres/([a-z0-9-]+)/?$              genre.php?slug=$1 [L,QSA]
+RewriteRule ^showtimes/([a-z0-9-]+)/?$            showtimes.php?slug=$1 [L,QSA]
+RewriteRule ^cities/([a-z0-9-]+)/?$               city.php?slug=$1 [L,QSA]
+
+# SEO REDIRECTS
+RewriteRule ^movies-today-lebanon/?$               / [R=301,L]
+RewriteRule ^movies-in-lebanon/?$                  /movies [R=301,L]
+RewriteRule ^coming-soon-lebanon/?$                /coming-soon [R=301,L]
+RewriteRule ^cinemas/lebanon/?$                    /cinemas [R=301,L]
+
+# ADMIN
+RewriteRule ^admin/?$                              admin/index.php [L,QSA]
+
+# MOVIES
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^movies/([a-z0-9-]+)/?$               movie.php?slug=$1 [L,QSA]
+RewriteRule ^movies/?$                             movies.php [L,QSA]
+
+# CINEMAS
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^cinemas/([a-z0-9-]+)/?$              cinema.php?slug=$1 [L,QSA]
+RewriteRule ^cinemas/?$                            cinemas.php [L,QSA]
+
+# STATIC PAGES
+RewriteRule ^today/?$                              index.php [L,QSA]
+RewriteRule ^search/?$                             search.php [L,QSA]
+RewriteRule ^trending/?$                           movies.php?sort=trending [L,QSA]
+RewriteRule ^coming-soon/?$                        movies.php?status=coming_soon [L,QSA]
+
+# HOMEPAGE
+RewriteRule ^$                                     index.php [L,QSA]
+
+# 404 FALLBACK
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .*                                     index.php?route=404 [L]
