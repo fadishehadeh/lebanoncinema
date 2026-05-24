@@ -227,13 +227,9 @@ include __DIR__ . '/includes/header.php';
         <a href="/movies" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach (array_slice($trending, 0, 10) as $i => $m):
+        <?php foreach (array_slice($trending, 0, 8) as $i => $m):
             $urgency = $m['first_showtime'] ? urgencyLabel(getMinutesUntil($m['first_showtime'])) : null;
-            // AD PLACEMENT 3: Inline after every 8th card
-            if ($i > 0 && $i % 8 === 0):
         ?>
-            <?php renderAd('in-card', 'ad-inline'); ?>
-        <?php endif; ?>
         <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
            data-movie-item
            data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"

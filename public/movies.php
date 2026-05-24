@@ -120,11 +120,7 @@ include __DIR__ . '/includes/header.php';
             $formats = [];
             if ($m['has_imax']) $formats[] = 'imax';
             if ($m['has_vip']) $formats[] = 'vip';
-            // Mid-grid ad after every 8 items
-            if ($i > 0 && $i % 8 === 0):
         ?>
-            <div style="grid-column:1/-1;padding:8px 0;"><?php renderAd('rectangle'); ?></div>
-        <?php endif; ?>
         <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
            data-movie-item
            data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"
