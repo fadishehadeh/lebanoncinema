@@ -219,12 +219,14 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             position: relative;
             z-index: 2;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
+            justify-content: center;
             gap: 48px;
             max-width: 1400px;
             margin: 0 auto;
             padding: 80px 48px 60px;
             width: 100%;
+            text-align: center;
         }
 
         .hero-poster {
@@ -241,7 +243,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             object-fit: cover;
         }
 
-        .hero-info { flex: 1; min-width: 0; max-width: 600px; }
+        .hero-info { flex: 1; min-width: 0; max-width: 600px; display:flex; flex-direction:column; align-items:center; }
 
         .hero-badge {
             display: inline-flex;
@@ -483,8 +485,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            justify-content: center;
         }
         .chips-row::-webkit-scrollbar { display: none; }
+        @media (max-width: 768px) { .chips-row { justify-content: flex-start; } }
 
         .chip {
             display: inline-flex;
@@ -1352,8 +1356,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             overflow-x: auto;
             padding: 0 24px 24px;
             scrollbar-width: none;
+            justify-content: center;
         }
         .genre-strip::-webkit-scrollbar { display: none; }
+        @media (max-width: 768px) { .genre-strip { justify-content: flex-start; } }
 
         .genre-pill {
             display: inline-flex;
