@@ -17,18 +17,17 @@ define('TMDB_IMG_W185', 'https://image.tmdb.org/t/p/w185');
 function detectBaseUrl(): string {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $uri    = $_SERVER['SCRIPT_NAME'] ?? '/';
 
-    // Remove filename from path to get the base directory
-    $baseDir = dirname($uri);
-    // Normalize backslashes to forward slashes
-    $baseDir = str_replace('\\', '/', $baseDir);
-    // Ensure no double slashes
+    // For non-localhost domains (production), use the host directly
+    if ($host !== 'localhost' && $host !== '127.0.0.1') {
+        return "$scheme://$host";
+    }
+
+    // For localhost, detect the base path from SCRIPT_NAME
+    $uri    = $_SERVER['SCRIPT_NAME'] ?? '/';
+    $baseDir = dirname(str_replace('\\', '/', $uri));
     $baseDir = rtrim($baseDir, '/');
 
-    // If baseDir ends with the document root, we need to handle differently
-    // For XAMPP: SCRIPT_NAME = /lebanoncinema/public/index.php → baseDir = /lebanoncinema/public
-    // But if DOCUMENT_ROOT is C:\xampp\htdocs, we need the path from DOCUMENT_ROOT
     if (empty($baseDir) || $baseDir === '.') {
         return "$scheme://$host";
     }
