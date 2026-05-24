@@ -55,11 +55,11 @@ function renderAdPlaceholder(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?> { margin:0 auto; }
-    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(229,9,20,0.06) 0%, rgba(229,9,20,0.02) 100%); border:1px solid rgba(229,9,20,0.1); overflow:hidden; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg);     background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
     #<?= $id ?> .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
     #<?= $id ?> .ad-label { position:absolute; top:6px; left:10px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.5; font-weight:700; font-family:'Inter',sans-serif; }
-    #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--accent); opacity:.15; font-size:.7rem; }
-    #<?= $id ?> .ad-skelly svg { opacity:.3; }
+    #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:#fff; opacity:.25; font-size:.7rem; }
+    #<?= $id ?> .ad-skelly svg { opacity:.4; }
     #<?= $id ?> .ad-leaderboard { width:100%; min-height:90px; padding:24px; }
     #<?= $id ?> .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; padding:16px; margin:0 auto; display:block; }
     #<?= $id ?> .ad-rectangle { width:100%; max-width:336px; min-height:250px; padding:24px; margin:0 auto; }
@@ -102,7 +102,7 @@ function renderAdsenseAd(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?>-wrap { margin:0 auto; }
-    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:linear-gradient(180deg,rgba(229,9,20,0.06) 0%, rgba(229,9,20,0.02) 100%); border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg);     background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
     #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
     #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.45; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
     .ad-leaderboard { width:100%; min-height:90px; }
