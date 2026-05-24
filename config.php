@@ -38,6 +38,10 @@ function detectBaseUrl(): string {
 define('SITE_NAME', 'Lebanon Cinema');
 define('BASE_URL', detectBaseUrl());
 
+// ─── Admin credentials ───
+define('ADMIN_USER', 'admin');
+define('ADMIN_PASS', 'lebcinema@2026');
+
 // Production override — keep this set for live domain, auto-detect otherwise
 if (defined('FORCE_SITE_URL')) {
     define('SITE_URL', FORCE_SITE_URL);

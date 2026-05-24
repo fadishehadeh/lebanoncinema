@@ -1,0 +1,34 @@
+<?php
+/**
+ * Simple admin authentication helper.
+ * Include at the top of any admin page.
+ */
+function requireAuth(): void {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['admin_logged_in'])) {
+        header('Location: ' . _link('/admin/login.php'));
+        exit;
+    }
+}
+
+function attemptLogin(string $user, string $pass): bool {
+    if ($user === ADMIN_USER && $pass === ADMIN_PASS) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['admin_logged_in'] = true;
+        $_SESSION['admin_user'] = $user;
+        return true;
+    }
+    return false;
+}
+
+function logout(): void {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    unset($_SESSION['admin_logged_in'], $_SESSION['admin_user']);
+    session_destroy();
+}

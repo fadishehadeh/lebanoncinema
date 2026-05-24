@@ -14,21 +14,20 @@ echo "==============================" >> "$LOG_FILE"
 echo "Started: $(date)"               >> "$LOG_FILE"
 echo "==============================" >> "$LOG_FILE"
 
-# 0. Run schema migration
+# 0. Schema migration
 echo "[Schema] Running migration..."  >> "$LOG_FILE"
 php -r "
     require '$PROJECT_DIR/config.php';
     runSchemaMigrations(getDbConnection());
-    echo 'Migration completed.\n';
 " >> "$LOG_FILE" 2>&1
 
-# 1. Sync movies from TMDb (now-playing + upcoming)
+# 1. Sync movies from TMDb
 echo "[TMDb Sync] Starting..."        >> "$LOG_FILE"
 php "$PROJECT_DIR/scraper/tmdb_sync.php" >> "$LOG_FILE" 2>&1
 
-# 2. Scrape VOX showtimes (7 days)
-echo "[VOX] Starting scrape..."       >> "$LOG_FILE"
-php "$PROJECT_DIR/scraper/vox_scraper.php" 7 >> "$LOG_FILE" 2>&1
+# 2. Run all cinema scrapers
+echo "[Scrapers] Running all..."      >> "$LOG_FILE"
+php "$PROJECT_DIR/scraper/run_all.php" >> "$LOG_FILE" 2>&1
 
 # 3. Regenerate sitemap
 echo "[Sitemap] Regenerating..."      >> "$LOG_FILE"

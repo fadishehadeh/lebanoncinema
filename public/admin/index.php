@@ -11,6 +11,8 @@
  * Uses TmdbService for API calls (admin-only).
  */
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../includes/auth.php';
+requireAuth();
 
 $db = getDbConnection();
 
@@ -165,6 +167,7 @@ $logs = $db->query("SELECT * FROM tmdb_sync_logs ORDER BY created_at DESC LIMIT 
         <div class="flex">
             <a href="<?= _link('/') ?>" class="btn btn-outline btn-sm" target="_blank">View Site</a>
             <a href="<?= _link('/admin') ?>" class="btn btn-outline btn-sm">Dashboard</a>
+            <a href="<?= _link('/admin/logout.php') ?>" class="btn btn-outline btn-sm" style="color:#FF3D71;">Logout</a>
         </div>
     </div>
 
