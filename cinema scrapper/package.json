@@ -1,0 +1,29 @@
+{
+  "name": "cinema-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for Lebanese cinema websites (Grand Cinema, Vox Cinemas, Cinema City)",
+  "main": "cinema-scraper.js",
+  "scripts": {
+    "start": "node cinema-scraper.js",
+    "scrape": "node cinema-scraper.js",
+    "scrape:puppeteer": "node cinema-scraper.js",
+    "scrape:cheerio": "node cinema-scraper-cheerio.js",
+    "server": "node server.js",
+    "dashboard": "node server.js"
+  },
+  "keywords": [
+    "scraper",
+    "cinema",
+    "movies",
+    "lebanon",
+    "web-scraping"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "express": "^4.22.2",
+    "puppeteer": "^21.0.0"
+  }
+}
