@@ -1,0 +1,69 @@
+{
+  "metadata": {
+    "scrapedAt": "2026-05-24T17:55:20.038Z",
+    "totalMovies": 12,
+    "source": "coming_soon"
+  },
+  "movies": [
+    {
+      "movie": "7 Dogs",
+      "source": "Vox Cinemas",
+      "slug": "7-dogs-arabic-english"
+    },
+    {
+      "movie": "Backrooms",
+      "source": "Vox Cinemas",
+      "slug": "backrooms"
+    },
+    {
+      "movie": "Masters of the Universe",
+      "source": "Vox Cinemas",
+      "slug": "masters-of-the-universe"
+    },
+    {
+      "movie": "The Crush",
+      "source": "Vox Cinemas",
+      "slug": "the-crush-arabic"
+    },
+    {
+      "movie": "Toy Story 5",
+      "source": "Vox Cinemas",
+      "slug": "toy-story-5"
+    },
+    {
+      "movie": "Supergirl",
+      "source": "Vox Cinemas",
+      "slug": "supergirl"
+    },
+    {
+      "movie": "Minions & Monsters",
+      "source": "Vox Cinemas",
+      "slug": "minions-and-monsters"
+    },
+    {
+      "movie": "The End of Oak Street",
+      "source": "Vox Cinemas",
+      "slug": "the-end-of-oak-street"
+    },
+    {
+      "movie": "Insidious: Out Of The Further",
+      "source": "Vox Cinemas",
+      "slug": "insidious-out-of-the-further"
+    },
+    {
+      "movie": "The Dog Stars",
+      "source": "Vox Cinemas",
+      "slug": "the-dog-stars"
+    },
+    {
+      "movie": "Verity",
+      "source": "Vox Cinemas",
+      "slug": "verity"
+    },
+    {
+      "movie": "Dune: Part Three",
+      "source": "Vox Cinemas",
+      "slug": "dune-part-three"
+    }
+  ]
+}
