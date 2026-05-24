@@ -591,6 +591,8 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             transition: all 0.3s var(--ease);
             border: none;
         }
+        @media (min-width: 1200px) { .poster-card { width: 240px; } }
+        @media (min-width: 1600px) { .poster-card { width: 280px; } }
         .poster-card:hover {
             transform: translateY(-4px) scale(1.04);
             box-shadow: 0 12px 40px rgba(0,0,0,0.6);
