@@ -594,6 +594,9 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             gap: 12px;
             padding: 0 24px;
         }
+        .carousel-grid .poster-card {
+            width: 100%;
+        }
         @media (max-width: 480px) {
             .carousel-grid {
                 grid-template-columns: repeat(2, 1fr);
