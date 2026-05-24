@@ -5,6 +5,10 @@ define('DB_NAME', 'lebanon_cinema');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
+// ─── Google AdSense ───
+define('ADSENSE_CLIENT', 'ca-pub-5198102919338219');
+define('ADSENSE_ENABLED', true);
+
 // ─── TMDB API ───
 define('TMDB_API_KEY', '6bd4ffa3cf62d122c558c4821fe66999');
 define('TMDB_BASE_URL', 'https://api.themoviedb.org/3');

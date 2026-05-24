@@ -179,6 +179,7 @@ $logs = $db->query("SELECT * FROM tmdb_sync_logs ORDER BY created_at DESC LIMIT 
         <a href="?view=movies" class="<?= $view === 'movies' ? 'active' : '' ?>">Movies</a>
         <a href="?view=import" class="<?= $view === 'import' ? 'active' : '' ?>">TMDb Import</a>
         <a href="?view=logs" class="<?= $view === 'logs' ? 'active' : '' ?>">Sync Logs</a>
+        <a href="ads.php">AdSense</a>
     </div>
 
     <?php if ($view === 'dashboard'): ?>

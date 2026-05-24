@@ -232,7 +232,7 @@ include __DIR__ . '/includes/header.php';
             // AD PLACEMENT 3: Inline in carousel after every 8th card
             if ($i > 0 && $i % 8 === 0):
         ?>
-            <?php renderAd('card', 'ad-inline'); ?>
+            <?php renderAd('in-card', 'ad-inline'); ?>
         <?php endif; ?>
         <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
            data-movie-item
