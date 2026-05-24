@@ -4,42 +4,80 @@ const fs = require('fs');
 const path = require('path');
 
 const headers = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 };
 
-async function fetchComingSoon() {
+async function main() {
   const results = [];
   
-  // VOX Coming Soon
+  // 1. VOX Coming Soon
   try {
-    console.log('Fetching VOX coming soon...');
+    console.log('=== VOX Cinemas Coming Soon ===');
     const res = await axios.get('https://lbn.voxcinemas.com/movies/comingsoon', { headers, timeout: 20000 });
     const $ = cheerio.load(res.data);
     $('article.movie-summary').each((i, el) => {
       const title = $(el).attr('data-title') || $(el).find('h3 a').text().trim();
-      const slug = $(el).attr('data-slug');
-      if (title && slug) {
-        results.push({ movie: title, source: 'Vox Cinemas', slug: slug });
+      if (title) results.push({ movie: title, source: 'Vox Cinemas' });
+    });
+    console.log('  Found: ' + results.filter(r => r.source === 'Vox Cinemas').length);
+  } catch(e) { console.log('  Error: ' + e.message); }
+  
+  // 2. Grand Cinema Coming Soon (try their upcoming page)
+  try {
+    console.log('\n=== Grand Cinema Coming Soon ===');
+    // Grand doesn't have a coming soon page, but let's try their main page for future dates
+    const res = await axios.get('https://leb.grandcinemasme.com/en', { headers, timeout: 20000 });
+    const $ = cheerio.load(res.data);
+    // Look for movie links
+    $('a[href*="/movie/"]').each((i, el) => {
+      const href = $(el).attr('href');
+      if (href && href.match(/\/movie\/([^\/]+)\/en/)) {
+        const title = $(el).text().trim() || $(el).attr('title') || $(el).find('h2, h3').text().trim();
+        if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+          results.push({ movie: title, source: 'Grand Cinema' });
+        }
       }
     });
-    console.log('  Found ' + $('article.movie-summary').length + ' movies');
+    console.log('  Found: ' + results.filter(r => r.source === 'Grand Cinema').length);
   } catch(e) { console.log('  Error: ' + e.message); }
-
-  // Deduplicate
-  const unique = [];
+  
+  // 3. Cinema City Coming Soon
+  try {
+    console.log('\n=== Cinema City Coming Soon ===');
+    const res = await axios.get('https://www.cinemacitybeirut.com/Browsing/Movies/ComingSoon', { headers, timeout: 20000 });
+    const $ = cheerio.load(res.data);
+    $('a[href*="/Browsing/Movies/Details/"]').each((i, el) => {
+      const title = $(el).text().trim();
+      if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+        results.push({ movie: title, source: 'Cinema City' });
+      }
+    });
+    // Also try to extract from boxout-title
+    $('h3.boxout-title').each((i, el) => {
+      const title = $(el).text().trim();
+      if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+        results.push({ movie: title, source: 'Cinema City' });
+      }
+    });
+    console.log('  Found: ' + results.filter(r => r.source === 'Cinema City').length);
+  } catch(e) { console.log('  Error: ' + e.message); }
+  
+  // Deduplicate by title
   const seen = new Set();
-  results.forEach(r => {
+  const unique = results.filter(r => {
     const key = r.movie.toLowerCase().trim();
-    if (!seen.has(key)) { seen.add(key); unique.push(r); }
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
-
-  console.log('\n=== Coming Soon Movies ===');
+  
+  console.log('\n=== All Coming Soon Movies (' + unique.length + ') ===');
   unique.forEach(r => console.log('  ' + r.movie + ' (' + r.source + ')'));
   
-  const output = { metadata: { scrapedAt: new Date().toISOString(), totalMovies: unique.length, source: 'coming_soon' }, movies: unique };
+  const output = { metadata: { scrapedAt: new Date().toISOString(), totalMovies: unique.length }, movies: unique };
   const outPath = path.join(__dirname, 'coming_soon.json');
   fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
   console.log('\nSaved to ' + outPath);
 }
 
-fetchComingSoon();
+main();

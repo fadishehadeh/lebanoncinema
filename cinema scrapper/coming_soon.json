@@ -1,69 +1,128 @@
 {
   "metadata": {
-    "scrapedAt": "2026-05-24T17:55:20.038Z",
-    "totalMovies": 12,
-    "source": "coming_soon"
+    "scrapedAt": "2026-05-24T18:01:32.701Z",
+    "totalMovies": 30
   },
   "movies": [
     {
       "movie": "7 Dogs",
-      "source": "Vox Cinemas",
-      "slug": "7-dogs-arabic-english"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Backrooms",
-      "source": "Vox Cinemas",
-      "slug": "backrooms"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Masters of the Universe",
-      "source": "Vox Cinemas",
-      "slug": "masters-of-the-universe"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "The Crush",
-      "source": "Vox Cinemas",
-      "slug": "the-crush-arabic"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Toy Story 5",
-      "source": "Vox Cinemas",
-      "slug": "toy-story-5"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Supergirl",
-      "source": "Vox Cinemas",
-      "slug": "supergirl"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Minions & Monsters",
-      "source": "Vox Cinemas",
-      "slug": "minions-and-monsters"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "The End of Oak Street",
-      "source": "Vox Cinemas",
-      "slug": "the-end-of-oak-street"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Insidious: Out Of The Further",
-      "source": "Vox Cinemas",
-      "slug": "insidious-out-of-the-further"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "The Dog Stars",
-      "source": "Vox Cinemas",
-      "slug": "the-dog-stars"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Verity",
-      "source": "Vox Cinemas",
-      "slug": "verity"
+      "source": "Vox Cinemas"
     },
     {
       "movie": "Dune: Part Three",
-      "source": "Vox Cinemas",
-      "slug": "dune-part-three"
+      "source": "Vox Cinemas"
+    },
+    {
+      "movie": "More Details",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Chum",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Shrek's 25th Anniversary",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Pitfall",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Scary Movie 6",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "The Crush الكراش",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Ezma",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "The Stories",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Evil Dead Burn",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "The Odyssey",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Spider-Man: Brand New Day",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "PAW Patrol: The Dino Movie",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "COYOTE vs ACME",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Resident Evil",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Street Fighter",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "Clayface",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "MAR CHARBEL MOVIE",
+      "source": "Cinema City"
+    },
+    {
+      "movie": "The Cat in the Hat",
+      "source": "Cinema City"
     }
   ]
 }
