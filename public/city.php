@@ -70,12 +70,38 @@ $breadcrumbs = [
     ['pos' => 3, 'name' => $cityName, 'url' => $canonical],
 ];
 
-$jsonLd = [[
-    '@type' => 'City',
-    'name' => htmlspecialchars($cityName),
-    'url' => $siteUrl . $canonical,
-    'containedIn' => ['@type' => 'Country', 'name' => 'Lebanon'],
-]];
+$cinemaList = array_map(fn($c) => $c['name'], $cinemas);
+$movieList = array_map(fn($m) => $m['title'], $movies);
+
+$jsonLd = [
+    [
+        '@type' => 'City',
+        'name' => $cityName,
+        'url' => $siteUrl . $canonical,
+        'containedIn' => ['@type' => 'Country', 'name' => 'Lebanon'],
+    ],
+    [
+        '@type' => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name' => 'What movies are showing in ' . $cityName . ' today?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => count($movies) . ' movies are showing today in ' . $cityName . ' including ' . implode(', ', array_slice($movieList, 0, 5)) . '. Browse full showtimes at ' . implode(', ', array_slice($cinemaList, 0, 4)) . '.',
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => 'Which cinemas are in ' . $cityName . '?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $cityName . ' has ' . count($cinemas) . ' cinemas: ' . implode(', ', $cinemaList) . '. Check showtimes and book tickets online.',
+                ],
+            ],
+        ],
+    ],
+];
 
 require_once __DIR__ . '/includes/ad.php';
 include __DIR__ . '/includes/header.php';
@@ -153,7 +179,7 @@ include __DIR__ . '/includes/header.php';
 
 <!-- SEO Content Block -->
 <section class="section" style="padding:0 24px;">
-    <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
+    <div class="seo-summary" style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
         <h2 style="font-size:1.2rem;margin-bottom:16px;">Movie Showtimes in <?= htmlspecialchars($cityName) ?></h2>
         <p style="color:var(--text-muted);line-height:1.7;margin-bottom:12px;">
             Looking for movie showtimes in <?= htmlspecialchars($cityName) ?>? LebanonCinema lists all <?= htmlspecialchars($cityName) ?> cinemas including 

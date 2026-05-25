@@ -98,7 +98,7 @@ $stmt->execute();
 $upcoming = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
 
 $pageTitle = 'Movies Showing Today in Lebanon — ' . SITE_NAME;
-$pageDescription = 'Discover movies playing today at cinemas across Lebanon. Browse showtimes for VOX, Grand, Empire, CinemaCity and more. Book tickets online.';
+$pageDescription = 'Find movies playing today at cinemas across Lebanon. Browse showtimes for VOX, Grand, Empire, CinemaCity and more. Watch trailers, check schedules, and book cinema tickets online.';
 $showSkeleton = true;
 $breadcrumbs = [];
 include __DIR__ . '/includes/header.php';

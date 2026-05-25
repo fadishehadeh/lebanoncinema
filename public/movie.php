@@ -152,7 +152,7 @@ if (count($related) < 6) {
 $siteUrl = rtrim(SITE_URL, '/');
 $canonicalUrl = $siteUrl . '/movies/' . rawurlencode($slug);
 $pageTitle = htmlspecialchars($movie['title']) . ' Showtimes in Lebanon — ' . SITE_NAME;
-$pageDescription = 'Find showtimes for "' . htmlspecialchars($movie['title']) . '" at cinemas across Lebanon. ' . ($movie['synopsis'] ? htmlspecialchars(substr($movie['synopsis'], 0, 150)) : 'Watch trailer, read synopsis, and book tickets online.');
+$pageDescription = htmlspecialchars($movie['title']) . ' showtimes in Lebanon — find where to watch at VOX, Grand, CinemaCity and more. ' . ($movie['synopsis'] ? htmlspecialchars(substr($movie['synopsis'], 0, 120)) : 'Watch trailer, check cinema schedules, and book tickets online.');
 $pageImage = $movie['poster_url'] ?? '';
 $canonical = '/movies/' . rawurlencode($slug);
 $breadcrumbs = [
@@ -191,12 +191,18 @@ $jsonLd = [
         '@id' => $canonicalUrl . '#movie',
         'name' => $movie['title'],
         'url' => $canonicalUrl,
-        'image' => $movie['poster_url'] ?? '',
+        'image' => $movie['poster_url'] ? ['@type' => 'ImageObject', 'url' => $movie['poster_url'], 'caption' => $movie['title'] . ' poster'] : '',
         'description' => $movie['synopsis'] ?? '',
         'datePublished' => $movie['release_date'] ?? '',
         'duration' => $movie['duration_min'] ? 'PT' . (int)$movie['duration_min'] . 'M' : '',
         'genre' => $movie['genres'] ? array_map('trim', explode(',', $movie['genres'])) : [],
-        'trailer' => $movie['trailer_url'] ? ['@type' => 'VideoObject', 'name' => $movie['title'] . ' Trailer', 'contentUrl' => $movie['trailer_url']] : null,
+        'trailer' => $movie['trailer_url'] ? ['@type' => 'VideoObject', 'name' => $movie['title'] . ' Trailer', 'contentUrl' => $movie['trailer_url'], 'description' => 'Watch the official trailer for ' . $movie['title']] : null,
+        'aggregateRating' => !empty($movie['vote_average']) ? [
+            '@type' => 'AggregateRating',
+            'ratingValue' => round((float)$movie['vote_average'], 1),
+            'bestRating' => 10,
+            'ratingCount' => (int)($movie['vote_count'] ?? 0),
+        ] : null,
     ],
     ...$screenings,
     [

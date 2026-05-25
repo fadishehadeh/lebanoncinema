@@ -79,7 +79,7 @@ $nearbyCinemas = $stmtNearby->fetchAll() ?? [];
 $siteUrl = rtrim(SITE_URL, '/');
 $canonical = '/cinemas/' . rawurlencode($slug);
 $pageTitle = htmlspecialchars($cinema['name']) . ' — Movie Showtimes & Tickets — ' . SITE_NAME;
-$pageDescription = 'Find movie showtimes at ' . htmlspecialchars($cinema['name']) . ' in ' . htmlspecialchars($cinema['city']) . ', Lebanon. ' . ($cinema['has_imax'] ? 'IMAX available. ' : '') . ($cinema['has_vip'] ? 'VIP seating available. ' : '') . 'View schedule and book tickets online.';
+$pageDescription = 'Movie showtimes at ' . htmlspecialchars($cinema['name']) . ' in ' . htmlspecialchars($cinema['city']) . ', Lebanon. ' . ($cinema['has_imax'] ? 'IMAX screenings available. ' : '') . ($cinema['has_vip'] ? 'VIP seating. ' : '') . 'Browse today\\\'s movies, check schedules, and book cinema tickets online.';
 $pageImage = '';
 $breadcrumbs = [
     ['pos' => 2, 'name' => 'Cinemas', 'url' => '/cinemas'],
