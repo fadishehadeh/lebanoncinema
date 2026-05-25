@@ -337,7 +337,7 @@ include __DIR__ . '/includes/header.php';
 <?php if (!empty($upcoming)): ?>
 <section class="section">
     <div class="section-header">
-        <h2 class="section-title">Coming Soon</h2>
+        <h2 class="section-title">Showing Soon</h2>
     </div>
     <div class="poster-wall stagger">
         <?php foreach ($upcoming as $m): ?>
