@@ -211,7 +211,6 @@ include __DIR__ . '/includes/header.php';
 <!-- ════════════════════ DISCOVERY CHIPS ════════════════════ -->
 <div class="chips-row">
     <button class="chip active" data-filter="all">All</button>
-    <button class="chip" data-filter="soon">Starting Soon</button>
     <button class="chip" data-filter="vip">VIP & IMAX</button>
     <button class="chip" data-filter="action">Action</button>
     <button class="chip" data-filter="comedy">Comedy</button>
