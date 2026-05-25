@@ -58,8 +58,11 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" as="style" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <link rel="alternate" hreflang="en" href="<?= htmlspecialchars($canonicalUrl) ?>">
+    <link rel="alternate" hreflang="x-default" href="<?= htmlspecialchars($canonicalUrl) ?>">
 
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5198102919338219" crossorigin="anonymous"></script>
@@ -1599,6 +1602,15 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
                     { "@type": "ListItem", "position": <?= (int)($b['pos'] ?? 2) ?>, "name": "<?= htmlspecialchars($b['name']) ?>", "item": "<?= $siteUrl ?>/<?= ltrim($b['url'] ?? '', '/') ?>" }
                     <?php endforeach; ?>
                     <?php endif; ?>
+                ]
+            },
+            {
+                "@type": "SpeakableSpecification",
+                "cssSelector": [
+                    ".hero-title",
+                    ".hero-tagline",
+                    ".section-title",
+                    ".seo-summary"
                 ]
             }
             <?php foreach ($jsonLd as $item): ?>,

@@ -182,6 +182,9 @@ if (isset($byDate[date('Y-m-d')])) {
     }
 }
 
+// Build cinema names list for FAQ
+$cinemaNamesList = !empty($showtimeRows) ? implode(', ', array_unique(array_map(fn($s) => $s['cinema_name'], $showtimeRows))) : 'select cinemas';
+
 $jsonLd = [
     [
         '@type' => 'Movie',
@@ -204,18 +207,30 @@ $jsonLd = [
                 'name' => 'Where can I watch ' . $movie['title'] . ' in Lebanon?',
                 'acceptedAnswer' => [
                     '@type' => 'Answer',
-                    'text' => $movie['title'] . ' is showing at ' . implode(', ', array_unique(array_map(fn($s) => $s['cinema_name'], $showtimeRows ?? []))) . '. Check showtimes and book tickets on LebanonCinema.',
+                    'text' => $movie['title'] . ' is currently showing at ' . $cinemaNamesList . '. Find showtimes, watch the trailer, and book tickets on LebanonCinema.',
                 ],
             ],
             [
                 '@type' => 'Question',
-                'name' => 'What time is ' . $movie['title'] . ' showing today?',
+                'name' => 'What time is ' . $movie['title'] . ' showing today in Beirut?',
                 'acceptedAnswer' => [
                     '@type' => 'Answer',
-                    'text' => 'Showtimes for ' . $movie['title'] . ' vary by cinema. View the full schedule including VOX, Grand, and other cinemas on LebanonCinema.',
+                    'text' => $movie['title'] . ' showtimes vary by cinema location. Check the full schedule at VOX, Grand, Empire, CinemaCity and other cinemas in Lebanon on LebanonCinema.',
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => 'Is ' . $movie['title'] . ' now showing in Lebanese cinemas?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => !empty($showtimeRows) ? 'Yes, ' . $movie['title'] . ' is currently showing at ' . $cinemaNamesList . '. Browse showtimes and book your tickets online.' : 'Check LebanonCinema for the latest showtime availability.',
                 ],
             ],
         ],
+    ],
+    [
+        '@type' => 'SpeakableSpecification',
+        'cssSelector' => ['.hero-tagline', '.detail-synopsis', '.seo-summary'],
     ],
 ];
 
@@ -385,6 +400,40 @@ include __DIR__ . '/includes/header.php';
 
 <!-- AD PLACEMENT: Below showtimes -->
 <?php renderAd('rectangle', 'ad-mt-6 ad-mb-2'); ?>
+
+<!-- SEO Summary Block (visible, indexable, AI-friendly) -->
+<section class="seo-summary" style="padding:0 24px;max-width:1200px;margin:0 auto 48px;">
+    <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
+        <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:12px;"><?= htmlspecialchars($movie['title']) ?> — Showtimes in Lebanon</h2>
+        <p style="color:var(--text-muted);line-height:1.7;font-size:0.85rem;margin-bottom:12px;">
+            Looking for <?= htmlspecialchars($movie['title']) ?> showtimes in Lebanon? 
+            <?php if (!empty($showtimeRows)): ?>
+            You can watch <?= htmlspecialchars($movie['title']) ?> at <?= htmlspecialchars($cinemaNamesList) ?>.
+            <?php endif; ?>
+            <?php if ($movie['duration_min']): ?>Runtime is <?= (int)$movie['duration_min'] ?> minutes.<?php endif; ?>
+            <?php if ($movie['release_date']): ?>Released <?= date('F j, Y', strtotime($movie['release_date'])) ?>.<?php endif; ?>
+            Browse showtimes, watch the trailer, and book tickets online.
+        </p>
+        <?php if ($movie['genres_list']): ?>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+            <?php foreach ($movie['genres_list'] as $g): ?>
+            <a href="<?= e_link('/genres/' . strtolower(str_replace(' ', '-', $g))) ?>" style="padding:4px 10px;border-radius:4px;background:var(--surface2);color:var(--text-muted);font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;"><?= htmlspecialchars($g) ?></a>
+            <?php endforeach; ?>
+            <?php if ($movie['imdb_id']): ?>
+            <a href="https://www.imdb.com/title/<?= htmlspecialchars($movie['imdb_id']) ?>/" target="_blank" rel="noopener" style="padding:4px 10px;border-radius:4px;background:#f5c518;color:#000;font-size:0.7rem;font-weight:700;">IMDb</a>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+        <div style="font-size:0.8rem;color:var(--text-muted);">
+            <strong>Available at:</strong>
+            <?php if (!empty($showtimeRows)): ?>
+            <?php foreach (array_unique(array_map(fn($s) => $s['cinema_name'], $showtimeRows)) as $name): ?>
+            <span style="margin-right:8px;">• <?= htmlspecialchars($name) ?></span>
+            <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
 
 <!-- RELATED MOVIES -->
 <?php if (!empty($related)): ?>

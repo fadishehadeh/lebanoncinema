@@ -86,29 +86,60 @@ $breadcrumbs = [
     ['pos' => 3, 'name' => $cinema['name'], 'url' => $canonical],
 ];
 
-$jsonLd = [[
-    '@type' => 'MovieTheater',
-    '@id' => $siteUrl . '/cinemas/' . rawurlencode($slug) . '#theater',
-    'name' => $cinema['name'],
-    'url' => $siteUrl . '/cinemas/' . rawurlencode($slug),
-    'description' => $cinema['chain_name'] . ' cinema in ' . $cinema['city'] . ($cinema['area'] ? ', ' . $cinema['area'] : '') . '.',
-    'telephone' => '',
-    'address' => [
-        '@type' => 'PostalAddress',
-        'addressLocality' => $cinema['city'],
-        'addressRegion' => $cinema['area'] ?? '',
-        'addressCountry' => 'LB',
+$jsonLd = [
+    [
+        '@type' => 'MovieTheater',
+        '@id' => $siteUrl . '/cinemas/' . rawurlencode($slug) . '#theater',
+        'name' => $cinema['name'],
+        'url' => $siteUrl . '/cinemas/' . rawurlencode($slug),
+        'description' => $cinema['chain_name'] . ' cinema in ' . $cinema['city'] . ($cinema['area'] ? ', ' . $cinema['area'] : '') . '. ' . ($cinema['has_imax'] ? 'Features IMAX. ' : '') . ($cinema['has_vip'] ? 'VIP seating available. ' : '') . 'View movie showtimes and book tickets.',
+        'telephone' => '',
+        'address' => [
+            '@type' => 'PostalAddress',
+            'addressLocality' => $cinema['city'],
+            'addressRegion' => $cinema['area'] ?? '',
+            'addressCountry' => 'LB',
+        ],
+        'containedInPlace' => [
+            '@type' => 'City',
+            'name' => $cinema['city'],
+        ],
+        'areaServed' => [
+            '@type' => 'City',
+            'name' => $cinema['city'],
+        ],
+        'amenityFeature' => array_merge(
+            $cinema['has_imax'] ? [['@type' => 'LocationFeatureSpecification', 'name' => 'IMAX']] : [],
+            $cinema['has_vip'] ? [['@type' => 'LocationFeatureSpecification', 'name' => 'VIP']] : [],
+            $cinema['has_4dx'] ? [['@type' => 'LocationFeatureSpecification', 'name' => '4DX']] : []
+        ),
     ],
-    'containedInPlace' => [
-        '@type' => 'City',
-        'name' => $cinema['city'],
+    [
+        '@type' => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name' => 'What movies are playing at ' . $cinema['name'] . ' today?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => 'Check ' . $cinema['name'] . ' showtimes on LebanonCinema for today\'s movies, schedules, and ticket booking.',
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name' => 'Where is ' . $cinema['name'] . ' located?',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $cinema['name'] . ' is located in ' . $cinema['city'] . ($cinema['area'] ? ', ' . $cinema['area'] : '') . ', Lebanon.',
+                ],
+            ],
+        ],
     ],
-    'amenityFeature' => array_merge(
-        $cinema['has_imax'] ? [['@type' => 'LocationFeatureSpecification', 'name' => 'IMAX']] : [],
-        $cinema['has_vip'] ? [['@type' => 'LocationFeatureSpecification', 'name' => 'VIP']] : [],
-        $cinema['has_4dx'] ? [['@type' => 'LocationFeatureSpecification', 'name' => '4DX']] : []
-    ),
-]];
+    [
+        '@type' => 'SpeakableSpecification',
+        'cssSelector' => ['.seo-summary', '.cinema-detail-location'],
+    ],
+];
 require_once __DIR__ . '/includes/ad.php';
 include __DIR__ . '/includes/header.php';
 ?>
@@ -267,6 +298,35 @@ if (!empty($otherCities)):
     </div>
 </section>
 <?php endif; ?>
+
+<!-- SEO Summary Block -->
+<section class="seo-summary" style="padding:0 24px;max-width:1200px;margin:0 auto 48px;">
+    <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
+        <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:12px;"><?= htmlspecialchars($cinema['name']) ?> — Cinema in <?= htmlspecialchars($cinema['city']) ?></h2>
+        <p style="color:var(--text-muted);line-height:1.7;font-size:0.85rem;margin-bottom:12px;">
+            <?= htmlspecialchars($cinema['name']) ?> is a <?= htmlspecialchars($cinema['chain_name']) ?> cinema located in <?= htmlspecialchars($cinema['city']) ?><?= $cinema['area'] ? ', ' . htmlspecialchars($cinema['area']) : '' ?>, Lebanon.
+            <?php if ($cinema['has_imax']): ?>Experience movies in IMAX format.<?php endif; ?>
+            <?php if ($cinema['has_vip']): ?>VIP seating available for a premium experience.<?php endif; ?>
+            Browse current movie showtimes, view available formats, and book tickets online.
+        </p>
+        <p style="color:var(--text-muted);font-size:0.85rem;">
+            <strong>Facilities:</strong>
+            <?php if ($cinema['has_imax']): ?><span style="margin-right:8px;">• IMAX</span><?php endif; ?>
+            <?php if ($cinema['has_vip']): ?><span style="margin-right:8px;">• VIP</span><?php endif; ?>
+            <?php if ($cinema['has_4dx']): ?><span style="margin-right:8px;">• 4DX</span><?php endif; ?>
+            • Standard screens
+        </p>
+        <?php if (!empty($nearbyCinemas)): ?>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-top:8px;">
+            <strong>Nearby cinemas:</strong>
+            <?php foreach ($nearbyCinemas as $nc): ?>
+            <a href="<?= e_link('/cinemas/' . rawurlencode($nc['slug'])) ?>" style="color:var(--accent);"><?= htmlspecialchars($nc['name']) ?></a> ·
+            <?php endforeach; ?>
+            <a href="/cinemas" style="color:var(--accent);">View all</a>
+        </p>
+        <?php endif; ?>
+    </div>
+</section>
 
 </div><!-- end page-enter -->
 

@@ -19,6 +19,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Homepage -->
     <url>
         <loc><?= url('/') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
@@ -26,6 +27,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Movies -->
     <url>
         <loc><?= url('/movies') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -33,6 +35,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Cinemas -->
     <url>
         <loc><?= url('/cinemas') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -40,6 +43,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Trending -->
     <url>
         <loc><?= url('/trending') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
     </url>
@@ -47,6 +51,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Coming Soon -->
     <url>
         <loc><?= url('/coming-soon') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -54,6 +59,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Search -->
     <url>
         <loc><?= url('/search') ?></loc>
+        <lastmod><?= $today ?></lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
