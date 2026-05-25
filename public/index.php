@@ -260,45 +260,6 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- ════════════════════ STARTING SOON ════════════════════ -->
-<?php if (!empty($startingSoon)): ?>
-<section class="section">
-    <div class="section-header">
-        <h2 class="section-title">Starting Soon</h2>
-    </div>
-    <div class="carousel-grid stagger">
-        <?php foreach (array_slice($startingSoon, 0, 20) as $m):
-            $mins = getMinutesUntil($m['next_showtime']);
-            $urgency = urgencyLabel($mins);
-        ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
-           data-movie-item
-           data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"
-           data-formats="<?= ($m['has_imax'] ? 'imax,' : '') . ($m['has_vip'] ? 'vip,' : '') ?>"
-           data-urgency="<?= $mins ?>">
-            <?php if ($m['poster_url']): ?>
-                <img class="poster-card-img" src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
-            <?php else: ?>
-                <div class="poster-card-img" style="background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:2.5rem;">
-                    <?= htmlspecialchars(substr($m['title'], 0, 1)) ?>
-                </div>
-            <?php endif; ?>
-            <?php if ($urgency): ?>
-                <span class="poster-card-badge <?= $urgency['class'] ?>"><?= htmlspecialchars($urgency['label']) ?></span>
-            <?php endif; ?>
-            <div class="poster-card-overlay">
-                <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
-                <div class="poster-card-meta"><?= htmlspecialchars($m['cinema_name']) ?></div>
-            </div>
-        </a>
-        <?php endforeach; ?>
-    </div>
-</section>
-<?php endif; ?>
-
-<!-- AD PLACEMENT 2: Mid-content (between Trending and Cinemas) -->
-<?php renderAd('rectangle', 'ad-mt-2 ad-mb-6'); ?>
-
 <!-- ════════════════════ CINEMAS NEAR YOU ════════════════════ -->
 <?php if (!empty($cinemas)): ?>
 <section class="section">
