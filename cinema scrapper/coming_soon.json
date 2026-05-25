@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "scrapedAt": "2026-05-24T18:01:32.701Z",
-    "totalMovies": 30
+    "scrapedAt": "2026-05-25T06:33:39.070Z",
+    "totalMovies": 42
   },
   "movies": [
     {
@@ -53,6 +53,76 @@
       "source": "Vox Cinemas"
     },
     {
+      "movie": "FUZE",
+      "source": "Grand Cinema",
+      "slug": "fuze"
+    },
+    {
+      "movie": "Hunting Season",
+      "source": "Grand Cinema",
+      "slug": "hunting-season"
+    },
+    {
+      "movie": "Shaun the Sheep: The Beast of Mossy Bottom",
+      "source": "Grand Cinema",
+      "slug": "shaun-the-sheep-the-beast-of-mossy-bottom"
+    },
+    {
+      "movie": "COYOTE vs ACME",
+      "source": "Grand Cinema",
+      "slug": "coyote-vs-acme"
+    },
+    {
+      "movie": "That Time I Got Reincarnated as a Slime the Movie: Tears of the Azure Sea",
+      "source": "Grand Cinema",
+      "slug": "that-time-i-got-reincarnated-as-a-slime-the-m"
+    },
+    {
+      "movie": "Ice Cream Man",
+      "source": "Grand Cinema",
+      "slug": "ice-cream-man"
+    },
+    {
+      "movie": "Idiots",
+      "source": "Grand Cinema",
+      "slug": "idiots"
+    },
+    {
+      "movie": "SCARY MOVIE",
+      "source": "Grand Cinema",
+      "slug": "scary-movie"
+    },
+    {
+      "movie": "The Bride!",
+      "source": "Grand Cinema",
+      "slug": "the-bride"
+    },
+    {
+      "movie": "SIRĀT",
+      "source": "Grand Cinema",
+      "slug": "sirat"
+    },
+    {
+      "movie": "MAR CHARBEL",
+      "source": "Grand Cinema",
+      "slug": "mar-charbel"
+    },
+    {
+      "movie": "NORMAL",
+      "source": "Grand Cinema",
+      "slug": "normal"
+    },
+    {
+      "movie": "THE WRECKER",
+      "source": "Grand Cinema",
+      "slug": "the-wrecker"
+    },
+    {
+      "movie": "SPIDER-MAN: BRAND NEW DAY",
+      "source": "Grand Cinema",
+      "slug": "spider-man-brand-new-day"
+    },
+    {
       "movie": "More Details",
       "source": "Cinema City"
     },
@@ -93,15 +163,7 @@
       "source": "Cinema City"
     },
     {
-      "movie": "Spider-Man: Brand New Day",
-      "source": "Cinema City"
-    },
-    {
       "movie": "PAW Patrol: The Dino Movie",
-      "source": "Cinema City"
-    },
-    {
-      "movie": "COYOTE vs ACME",
       "source": "Cinema City"
     },
     {

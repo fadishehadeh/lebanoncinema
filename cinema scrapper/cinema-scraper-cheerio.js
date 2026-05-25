@@ -252,87 +252,94 @@ async function scrapeGrandCinema() {
   const baseUrl = 'https://leb.grandcinemasme.com';
   const movies = [];
   const branchNames = ['ABC Achrafieh', 'Grand ABC Dbayeh', 'Grand ABC Verdun', 'The Spot Saida', 'Las salinas'];
+  const cinemaMap = {
+    'ABC Achrafieh': 'grand-abc-achrafieh',
+    'Grand ABC Dbayeh': 'grand-abc-dbayeh',
+    'Grand ABC Verdun': 'grand-abc-verdun',
+    'The Spot Saida': 'grand-the-spot-saida',
+    'Las salinas': 'grand-las-salinas',
+  };
 
   try {
-    // Step 1: Get movie listing
+    // Step 1: Get movie listing from homepage (both now-showing and coming-soon)
     console.log('  Step 1: Fetching movie list from /en...');
     const listResponse = await axios.get(`${baseUrl}/en`, { headers, timeout: 15000 });
     const $ = cheerio.load(listResponse.data);
 
+    // Extract movies from NOW SHOWING tab (#movies_1)
     const movieSlugs = new Set();
-    $('a[href*="/movie/"]').each((i, el) => {
-      const href = $(el).attr('href');
+    const movieTitles = {};
+    const movieCinemas = {};
+    
+    $('#movies_1 .movie').each((i, el) => {
+      const href = $(el).find('a.thumbnaila').attr('href') || '';
       const match = href.match(/\/movie\/([^\/]+)\/en/);
-      if (match && match[1]) movieSlugs.add(match[1]);
+      if (match && match[1]) {
+        const slug = match[1];
+        movieSlugs.add(slug);
+        const title = $(el).find('.movie-hover-title').text().trim();
+        if (title) movieTitles[slug] = title;
+        const cinemas = $(el).attr('data-cinemas') || '';
+        movieCinemas[slug] = cinemas.split(',').filter(Boolean).map(Number);
+      }
     });
 
-    console.log(`  Found ${movieSlugs.size} movies. Fetching details...`);
+    console.log(`  Found ${movieSlugs.size} now-showing movies. Fetching details...`);
 
-    // Step 2: For each movie, fetch detail page
+    // Step 2: For each movie, fetch detail page for times
     for (const slug of movieSlugs) {
-      await delay(1000); // Rate limiting
+      await delay(1000);
 
       try {
         const detailUrl = `${baseUrl}/movie/${slug}/en`;
         const detailResponse = await axios.get(detailUrl, { headers, timeout: 15000 });
-        const $$ = cheerio.load(detailResponse.data);
+        const pageText = detailResponse.data;
+        
+        // Extract title from <title> tag
+        const titleMatch = pageText.match(/<title>([^<]+)<\/title>/i);
+        const title = titleMatch ? titleMatch[1].trim() : (movieTitles[slug] || slug.replace(/-/g, ' '));
 
-        // Get movie title
-        const title = $$('h1').first().text().trim() || slug.replace(/-/g, ' ');
-        if (!title || title.length < 2) continue;
+        // Extract dates - looking for YYYY-MM-DD patterns
+        const dateMatches = pageText.match(/\d{4}-\d{2}-\d{2}/g) || [];
+        const uniqueDates = [...new Set(dateMatches)].filter(d => d >= new Date().toISOString().split('T')[0]);
 
-        // Grand Cinema: extract times and associate with branches/screen types
-        const pageText = $$('body').html() || '';
-
-        // Check which branches are available on this page
-        const detectedBranches = [];
-        for (const branch of branchNames) {
-          if (pageText.includes(branch)) {
-            detectedBranches.push(branch);
-          }
-        }
-
-        // If no specific branch found, use generic
-        if (detectedBranches.length === 0) {
-          detectedBranches.push('Not specified');
-        }
-
-        // Extract times using regex - look for HH:MM patterns
+        // Extract times - looking for HH:MM patterns
         const timeMatches = pageText.match(/\b([0-1]?[0-9]:[0-5][0-9])\b/g) || [];
-        const uniqueTimes = [...new Set(timeMatches)];
+        const uniqueTimes = [...new Set(timeMatches)].filter(t => {
+          const h = parseInt(t.split(':')[0]);
+          return h >= 8 && h <= 23; // Only reasonable showtimes
+        });
 
-        // Check for screen types (VIP, STD)
-        const hasVIP = pageText.includes('VIP');
-        const screenTypes = [];
-        if (hasVIP) {
-          screenTypes.push('VIP');
-        }
-        screenTypes.push('STD'); // Standard is always available
+        // Check for VIP/STD in page
+        const hasVIP = /VIP/i.test(pageText);
+        const formats = hasVIP ? ['VIP', 'STD'] : ['STD'];
 
-        // Generate records for each detected time + branch + screen type combination
-        if (uniqueTimes.length > 0) {
-          uniqueTimes.forEach(timeStr => {
+        // Get associated cinemas for this movie
+        const cinemaIds = movieCinemas[slug] || [];
+        const cinemaNames = cinemaIds.map(id => {
+          const map = {5: 'ABC Achrafieh', 6: 'Grand ABC Dbayeh', 7: 'Grand ABC Verdun', 8: 'The Spot Saida', 22: 'Las salinas'};
+          return map[id];
+        }).filter(Boolean);
+
+        const validBranches = cinemaNames.length > 0 ? cinemaNames : branchNames;
+
+        // Generate entries for each date + time + cinema + format
+        for (const dateStr of uniqueDates) {
+          for (const timeStr of uniqueTimes) {
             const timeNorm = normalizeTime(timeStr);
-
-            detectedBranches.forEach(branch => {
-              screenTypes.forEach(screenType => {
-                const locationWithScreen = `${branch} - ${screenType}`;
-
-                const movie = {
+            for (const branch of validBranches) {
+              for (const fmt of formats) {
+                movies.push({
                   movie: title,
-                  date: new Date().toISOString().split('T')[0],
+                  date: dateStr,
                   time: timeNorm,
-                  location: locationWithScreen,
+                  location: `${branch} - ${fmt}`,
                   cinema: 'Grand Cinema',
                   url: detailUrl
-                };
-
-                if (isValidMovie(movie)) {
-                  movies.push(movie);
-                }
-              });
-            });
-          });
+                });
+              }
+            }
+          }
         }
 
       } catch (error) {

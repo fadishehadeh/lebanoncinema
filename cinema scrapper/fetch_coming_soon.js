@@ -22,20 +22,16 @@ async function main() {
     console.log('  Found: ' + results.filter(r => r.source === 'Vox Cinemas').length);
   } catch(e) { console.log('  Error: ' + e.message); }
   
-  // 2. Grand Cinema Coming Soon (try their upcoming page)
+  // 2. Grand Cinema Coming Soon (from #movies_2 tab)
   try {
     console.log('\n=== Grand Cinema Coming Soon ===');
-    // Grand doesn't have a coming soon page, but let's try their main page for future dates
     const res = await axios.get('https://leb.grandcinemasme.com/en', { headers, timeout: 20000 });
     const $ = cheerio.load(res.data);
-    // Look for movie links
-    $('a[href*="/movie/"]').each((i, el) => {
-      const href = $(el).attr('href');
-      if (href && href.match(/\/movie\/([^\/]+)\/en/)) {
-        const title = $(el).text().trim() || $(el).attr('title') || $(el).find('h2, h3').text().trim();
-        if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
-          results.push({ movie: title, source: 'Grand Cinema' });
-        }
+    $('#movies_2 .movie').each((i, el) => {
+      const title = $(el).find('.movie-hover-title').text().trim();
+      const href = $(el).find('a.thumbnaila').attr('href') || '';
+      if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+        results.push({ movie: title, source: 'Grand Cinema', slug: href.split('/')[2] || '' });
       }
     });
     console.log('  Found: ' + results.filter(r => r.source === 'Grand Cinema').length);
