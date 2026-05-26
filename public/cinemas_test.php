@@ -47,7 +47,7 @@ include __DIR__ . '/includes/header.php';
                 <a href="cinema.php?slug=<?= htmlspecialchars($cinema['slug']) ?>" class="btn btn-sm btn-primary">
                     View Showtimes
                 </a>
-                <a href="/cinemas/<?= htmlspecialchars($cinema['slug']) ?>" class="btn btn-sm btn-outline-secondary" style="display:none;">
+                <a href="<?= e_link('/cinemas/' . rawurlencode($cinema['slug'])) ?>" class="btn btn-sm btn-outline-secondary" style="display:none;">
                     (Clean URL)
                 </a>
             </div>

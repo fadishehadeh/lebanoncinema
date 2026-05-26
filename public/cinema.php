@@ -241,14 +241,14 @@ include __DIR__ . '/includes/header.php';
             <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:4px;">What movies are playing at <?= htmlspecialchars($cinema['name']) ?> today?</h3>
             <p style="color:var(--text-muted);font-size:0.85rem;">
                 View movies and showtimes at <?= htmlspecialchars($cinema['name']) ?> above. Browse showtimes across all <?= htmlspecialchars($cinema['city']) ?> cinemas
-                at <a href="/showtimes/<?= urlencode(strtolower(str_replace(' ', '-', $cinema['city']))) ?>" style="color:var(--accent);">showtimes in <?= htmlspecialchars($cinema['city']) ?></a>.
+                at <a href="<?= e_link('/showtimes/' . strtolower(str_replace(' ', '-', $cinema['city']))) ?>" style="color:var(--accent);">showtimes in <?= htmlspecialchars($cinema['city']) ?></a>.
             </p>
         </div>
         <div>
             <h3 style="font-size:0.9rem;font-weight:600;margin-bottom:4px;">Is <?= htmlspecialchars($cinema['name']) ?> a <?= htmlspecialchars($cinema['chain_name']) ?> cinema?</h3>
             <p style="color:var(--text-muted);font-size:0.85rem;">
                 Yes, <?= htmlspecialchars($cinema['name']) ?> is part of the <?= htmlspecialchars($cinema['chain_name']) ?> chain.
-                View all <a href="/cinemas" style="color:var(--accent);">cinemas in Lebanon</a> including <?= htmlspecialchars($cinema['chain_name']) ?> locations.
+                View all <a href="<?= e_link('/cinemas') ?>" style="color:var(--accent);">cinemas in Lebanon</a> including <?= htmlspecialchars($cinema['chain_name']) ?> locations.
             </p>
         </div>
     </div>
@@ -264,9 +264,9 @@ if (!empty($otherCities)):
 <section class="section" style="padding:0 24px;">
     <h2 class="section-title" style="margin-bottom:16px;font-size:1rem;"><?= htmlspecialchars($cinema['city']) ?> Cinemas &amp; Other Cities</h2>
     <div class="genre-strip">
-        <a href="/showtimes/<?= urlencode(strtolower(str_replace(' ', '-', $cinema['city']))) ?>" class="genre-pill">Showtimes in <?= htmlspecialchars($cinema['city']) ?></a>
+        <a href="<?= e_link('/showtimes/' . strtolower(str_replace(' ', '-', $cinema['city']))) ?>" class="genre-pill">Showtimes in <?= htmlspecialchars($cinema['city']) ?></a>
         <?php foreach ($otherCities as $oc): ?>
-        <a href="/showtimes/<?= urlencode(strtolower(str_replace(' ', '-', $oc['city']))) ?>" class="genre-pill"><?= htmlspecialchars($oc['city']) ?></a>
+        <a href="<?= e_link('/showtimes/' . strtolower(str_replace(' ', '-', $oc['city']))) ?>" class="genre-pill"><?= htmlspecialchars($oc['city']) ?></a>
         <?php endforeach; ?>
     </div>
 </section>
@@ -280,7 +280,7 @@ if (!empty($otherCities)):
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Nearby Cinemas</h2>
-        <a href="/cinemas" class="section-link">See all</a>
+        <a href="<?= e_link('/cinemas') ?>" class="section-link">See all</a>
     </div>
     <div class="cinema-scroll stagger">
         <?php foreach ($nearbyCinemas as $nc): ?>
@@ -322,7 +322,7 @@ if (!empty($otherCities)):
             <?php foreach ($nearbyCinemas as $nc): ?>
             <a href="<?= e_link('/cinemas/' . rawurlencode($nc['slug'])) ?>" style="color:var(--accent);"><?= htmlspecialchars($nc['name']) ?></a> ·
             <?php endforeach; ?>
-            <a href="/cinemas" style="color:var(--accent);">View all</a>
+            <a href="<?= e_link('/cinemas') ?>" style="color:var(--accent);">View all</a>
         </p>
         <?php endif; ?>
     </div>

@@ -292,7 +292,7 @@ include __DIR__ . '/includes/header.php';
             <?php endif; ?>
             <?php if ($movie['genres']): ?>
                 <?php foreach (array_map('trim', explode(',', $movie['genres'])) as $g): ?>
-                    <a href="/genres/<?= urlencode(strtolower(str_replace(' ', '-', $g))) ?>" class="detail-tag genre"><?= htmlspecialchars($g) ?></a>
+                    <a href="<?= e_link('/genres/' . strtolower(str_replace(' ', '-', $g))) ?>" class="detail-tag genre"><?= htmlspecialchars($g) ?></a>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
@@ -439,7 +439,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section" style="margin-top:48px;">
     <div class="section-header">
         <h2 class="section-title">You Might Also Like</h2>
-        <a href="/movies" class="section-link">More movies</a>
+        <a href="<?= e_link('/movies') ?>" class="section-link">More movies</a>
     </div>
     <div class="carousel stagger">
         <?php foreach ($related as $r): ?>

@@ -130,7 +130,7 @@ include __DIR__ . '/includes/header.php';
     <?php if (!empty($trendingGenres)): ?>
     <div class="chips-row">
         <?php foreach ($trendingGenres as $g): ?>
-        <a href="/search?q=<?= urlencode($g) ?>" class="chip"><?= htmlspecialchars($g) ?></a>
+        <a href="<?= e_link('/search?q=' . urlencode($g)) ?>" class="chip"><?= htmlspecialchars($g) ?></a>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
@@ -156,7 +156,7 @@ include __DIR__ . '/includes/header.php';
         </div>
         <div class="chips-row">
             <?php foreach ($trendingGenres as $g): ?>
-            <a href="/search?q=<?= urlencode($g) ?>" class="chip"><?= htmlspecialchars($g) ?></a>
+            <a href="<?= e_link('/search?q=' . urlencode($g)) ?>" class="chip"><?= htmlspecialchars($g) ?></a>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>

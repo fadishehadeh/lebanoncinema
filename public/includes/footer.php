@@ -219,7 +219,7 @@ function renderSearch(data) {
         data.movies.forEach(m => {
             const initial = m.title ? m.title.charAt(0).toUpperCase() : '?';
             html += `
-                <a href="/movies/${encodeURIComponent(m.slug)}" class="search-item">
+                <a href="<?= _link('/movies') ?>/${encodeURIComponent(m.slug)}" class="search-item">
                     ${m.poster_url
                         ? `<img src="${m.poster_url}" alt="" class="search-item-poster">`
                         : `<div class="search-item-poster" style="display:flex;align-items:center;justify-content:center;background:var(--surface);color:var(--text-muted);font-size:1rem;">${initial}</div>`
@@ -244,7 +244,7 @@ function renderSearch(data) {
         html += '<div class="search-group-label">Cinemas</div>';
         data.cinemas.forEach(c => {
             html += `
-                <a href="/cinemas/${encodeURIComponent(c.slug)}" class="search-item">
+                <a href="<?= _link('/cinemas') ?>/${encodeURIComponent(c.slug)}" class="search-item">
                     <div style="width:10px;height:10px;border-radius:50%;background:${c.color_hex};flex-shrink:0;"></div>
                     <div class="search-item-info">
                         <div class="search-item-title">${c.name}</div>

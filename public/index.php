@@ -253,7 +253,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Trending Tonight</h2>
-        <a href="/movies" class="section-link">See all</a>
+        <a href="<?= e_link('/movies') ?>" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
         <?php foreach (array_slice($trending, 0, 20) as $i => $m):
@@ -294,7 +294,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Cinemas Near You</h2>
-        <a href="/cinemas" class="section-link">See all</a>
+        <a href="<?= e_link('/cinemas') ?>" class="section-link">See all</a>
     </div>
     <div class="cinema-scroll stagger">
         <?php foreach ($cinemas as $c): ?>

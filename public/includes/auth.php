@@ -8,8 +8,7 @@ function requireAuth(): void {
         session_start();
     }
     if (empty($_SESSION['admin_logged_in'])) {
-        // Use relative path to avoid SITE_URL detection issues with rewrites
-        header('Location: /admin/login.php');
+        header('Location: ' . _link('/admin/login.php'));
         exit;
     }
 }

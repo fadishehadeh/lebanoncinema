@@ -100,9 +100,9 @@ include __DIR__ . '/includes/header.php';
 <!-- Genre Filter -->
 <?php if (!empty($allGenres)): ?>
 <div class="genre-strip">
-    <a href="/movies" class="genre-pill <?= !$genreFilter ? 'active' : '' ?>">All</a>
+    <a href="<?= e_link('/movies') ?>" class="genre-pill <?= !$genreFilter ? 'active' : '' ?>">All</a>
     <?php foreach ($allGenres as $g): ?>
-        <a href="/movies?genre=<?= urlencode($g) ?>"
+        <a href="<?= e_link('/movies?genre=' . urlencode($g)) ?>"
            class="genre-pill <?= ($genreFilter === $g) ? 'active' : '' ?>">
             <?= htmlspecialchars($g) ?>
         </a>

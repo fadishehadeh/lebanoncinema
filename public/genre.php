@@ -117,7 +117,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Now Showing</h2>
-        <?php if (count($movies) > 12): ?><a href="/movies?genre=<?= urlencode($genreName) ?>" class="section-link">See all</a><?php endif; ?>
+        <?php if (count($movies) > 12): ?><a href="<?= e_link('/movies?genre=' . urlencode($genreName)) ?>" class="section-link">See all</a><?php endif; ?>
     </div>
     <div class="movie-grid stagger">
         <?php foreach ($movies as $m): ?>
@@ -149,7 +149,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Cinemas Showing <?= htmlspecialchars($genreName) ?> Movies</h2>
-        <a href="/cinemas" class="section-link">All cinemas</a>
+        <a href="<?= e_link('/cinemas') ?>" class="section-link">All cinemas</a>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:0 24px;">
         <?php foreach ($cinemas as $c): ?>
@@ -191,9 +191,9 @@ $otherGenres = array_slice($otherGenres, 0, 6);
     <h2 class="section-title" style="margin-bottom:16px;">Browse Other Genres</h2>
     <div class="genre-strip">
         <?php foreach ($otherGenres as $g): ?>
-        <a href="/genres/<?= urlencode(strtolower(str_replace(' ', '-', $g))) ?>" class="genre-pill"><?= htmlspecialchars($g) ?></a>
+        <a href="<?= e_link('/genres/' . strtolower(str_replace(' ', '-', $g))) ?>" class="genre-pill"><?= htmlspecialchars($g) ?></a>
         <?php endforeach; ?>
-        <a href="/movies" class="genre-pill">All Movies</a>
+        <a href="<?= e_link('/movies') ?>" class="genre-pill">All Movies</a>
     </div>
 </section>
 

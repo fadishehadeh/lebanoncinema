@@ -27,9 +27,14 @@ function detectBaseUrl(): string {
         return "$scheme://$host";
     }
 
-    // For localhost, detect the base path from SCRIPT_NAME
-    $uri    = $_SERVER['SCRIPT_NAME'] ?? '/';
-    $baseDir = dirname(str_replace('\\', '/', $uri));
+    // For localhost, clamp the base path to the app's public root.
+    $uri = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/');
+    $publicPos = strpos($uri, '/public/');
+    if ($publicPos !== false) {
+        $baseDir = substr($uri, 0, $publicPos + strlen('/public'));
+    } else {
+        $baseDir = dirname($uri);
+    }
     $baseDir = rtrim($baseDir, '/');
 
     if (empty($baseDir) || $baseDir === '.') {

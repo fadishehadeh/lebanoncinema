@@ -152,7 +152,7 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Movies Playing Today in <?= htmlspecialchars($cityName) ?></h2>
-        <a href="/movies" class="section-link">All movies</a>
+        <a href="<?= e_link('/movies') ?>" class="section-link">All movies</a>
     </div>
     <div class="movie-grid stagger">
         <?php foreach ($movies as $m): ?>

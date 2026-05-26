@@ -107,7 +107,7 @@ include __DIR__ . '/includes/header.php';
             <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:8px;height:8px;border-radius:50%;background:<?= htmlspecialchars($cinema['color']) ?>;flex-shrink:0;"></div>
                 <h2 class="section-title" style="font-size:1.1rem;">
-                    <a href="<?= e_link('/cinemas/' . rawurlencode($cinema['slug'])) ?>"" style="color:var(--text);">
+                    <a href="<?= e_link('/cinemas/' . rawurlencode($cinema['slug'])) ?>" style="color:var(--text);">
                         <?= htmlspecialchars($cinema['name']) ?>
                     </a>
                 </h2>
@@ -188,7 +188,7 @@ if (!empty($otherCities)):
     <h2 class="section-title" style="margin-bottom:16px;">Showtimes in Other Cities</h2>
     <div class="genre-strip">
         <?php foreach ($otherCities as $oc): ?>
-        <a href="/showtimes/<?= urlencode(strtolower(str_replace(' ', '-', $oc['city']))) ?>" class="genre-pill"><?= htmlspecialchars($oc['city']) ?></a>
+        <a href="<?= e_link('/showtimes/' . strtolower(str_replace(' ', '-', $oc['city']))) ?>" class="genre-pill"><?= htmlspecialchars($oc['city']) ?></a>
         <?php endforeach; ?>
     </div>
 </section>

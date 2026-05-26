@@ -87,9 +87,9 @@ include __DIR__ . '/includes/header.php';
 
             <div class="mt-4">
                 <h5>🚀 When ready, visit:</h5>
-                <a href="/" class="btn btn-primary btn-lg">Go to Homepage</a>
-                <a href="/movies" class="btn btn-outline-primary btn-lg">Browse Movies</a>
-                <a href="/cinemas" class="btn btn-outline-primary btn-lg">Browse Cinemas</a>
+                <a href="<?= e_link('/') ?>" class="btn btn-primary btn-lg">Go to Homepage</a>
+                <a href="<?= e_link('/movies') ?>" class="btn btn-outline-primary btn-lg">Browse Movies</a>
+                <a href="<?= e_link('/cinemas') ?>" class="btn btn-outline-primary btn-lg">Browse Cinemas</a>
             </div>
 
         </div>
