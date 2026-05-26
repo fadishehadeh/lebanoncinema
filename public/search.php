@@ -188,8 +188,7 @@ include __DIR__ . '/includes/header.php';
             <?php endforeach; ?>
         </div>
 
-        <!-- AD between results -->
-        <?php renderAd('rectangle', 'ad-mb-4'); ?>
+        <?php renderAd('rectangle', ['placement' => 'search_results_inline']); ?>
         <?php endif; ?>
 
         <!-- Cinemas Results -->
@@ -215,6 +214,9 @@ include __DIR__ . '/includes/header.php';
             </a>
             <?php endforeach; ?>
         </div>
+        <?php if (count($cinemas) >= 4 || count($movies) >= 8): ?>
+            <?php renderAd('leaderboard', ['placement' => 'search_lower_inline']); ?>
+        <?php endif; ?>
         <?php endif; ?>
     <?php endif; ?>
 <?php endif; ?>

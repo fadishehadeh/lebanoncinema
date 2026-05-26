@@ -57,6 +57,10 @@
     </div>
 </footer>
 
+<?php if (function_exists('renderAd')): ?>
+<?php renderAd('mobile-leaderboard', ['placement' => 'global_mobile_anchor']); ?>
+<?php endif; ?>
+
 <?php if (isset($showSkeleton) && $showSkeleton): ?>
 <script>
 // Show skeleton while data loads

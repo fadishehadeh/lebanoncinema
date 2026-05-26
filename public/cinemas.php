@@ -95,7 +95,7 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
     <?php if ($chainIdx % 2 === 0 && $chainIdx < count($byChain)): ?>
-        <?php renderAd('rectangle', 'ad-mt-2 ad-mb-2'); ?>
+        <?php renderAd('rectangle', ['placement' => 'cinemas_chain_inline']); ?>
     <?php endif; ?>
     <?php endforeach; ?>
 <?php endif; ?>

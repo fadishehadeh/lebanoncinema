@@ -336,6 +336,8 @@ include __DIR__ . '/includes/header.php';
     </div>
 </div>
 
+<?php renderAd('leaderboard', ['placement' => 'movie_hero_inline']); ?>
+
 <!-- Trailer -->
 <?php if ($videoId): ?>
 <div class="showtimes-wrap" id="trailer" style="margin-bottom:48px;">
@@ -347,7 +349,8 @@ include __DIR__ . '/includes/header.php';
 </div>
 <?php endif; ?>
 
-<!-- Showtimes -->
+<div class="ad-layout-rail">
+<div class="ad-layout-main">
 <?php if (!empty($byDate)): ?>
 <div class="showtimes-wrap">
     <h2 class="section-title" style="margin-bottom:20px;">Showtimes</h2>
@@ -397,10 +400,8 @@ include __DIR__ . '/includes/header.php';
 </div>
 <?php endif; ?>
 
-<!-- AD PLACEMENT: Below showtimes -->
-<?php renderAd('rectangle', 'ad-mt-6 ad-mb-2'); ?>
+<?php renderAd('rectangle', ['placement' => 'movie_showtimes_inline']); ?>
 
-<!-- SEO Summary Block (visible, indexable, AI-friendly) -->
 <section class="seo-summary" style="padding:0 24px;max-width:1200px;margin:0 auto 48px;">
     <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
         <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:12px;"><?= htmlspecialchars($movie['title']) ?> — Showtimes in Lebanon</h2>
@@ -433,6 +434,11 @@ include __DIR__ . '/includes/header.php';
         </div>
     </div>
 </section>
+ </div>
+ <aside class="ad-layout-side">
+    <?php renderAd('skyscraper', ['placement' => 'movie_sidebar_sticky']); ?>
+ </aside>
+</div>
 
 <!-- RELATED MOVIES -->
 <?php if (!empty($related)): ?>

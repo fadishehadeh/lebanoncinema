@@ -225,6 +225,8 @@ include __DIR__ . '/includes/header.php';
 </div>
 <?php endif; ?>
 
+<?php renderAd('leaderboard', ['placement' => 'cinema_inline']); ?>
+
 <!-- SEO Content + FAQ Block -->
 <section class="section" style="padding:0 24px;">
     <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
@@ -272,8 +274,7 @@ if (!empty($otherCities)):
 </section>
 <?php endif; ?>
 
-<!-- AD PLACEMENT: Below showtimes -->
-<?php renderAd('rectangle', 'ad-mt-4 ad-mb-2'); ?>
+<?php renderAd('rectangle', ['placement' => 'cinema_lower']); ?>
 
 <!-- NEARBY CINEMAS -->
 <?php if (!empty($nearbyCinemas)): ?>

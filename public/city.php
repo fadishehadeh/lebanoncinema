@@ -144,7 +144,7 @@ include __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<?php renderAd('leaderboard', 'ad-mt-2 ad-mb-4'); ?>
+<?php renderAd('leaderboard', ['placement' => 'city_top']); ?>
 <?php endif; ?>
 
 <!-- Movies playing today -->
@@ -210,7 +210,7 @@ include __DIR__ . '/includes/header.php';
     </div>
 </section>
 
-<?php renderAd('leaderboard', 'ad-mt-4 ad-mb-2'); ?>
+<?php renderAd('leaderboard', ['placement' => 'city_lower']); ?>
 
 </div><!-- end page-enter -->
 <?php include __DIR__ . '/includes/footer.php'; ?>

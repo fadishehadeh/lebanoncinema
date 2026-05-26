@@ -268,7 +268,7 @@ require_once __DIR__ . '/includes/ad.php';
     </div>
 </section>
 
-<?php renderAd('leaderboard', 'ad-mt-2 ad-mb-6 ad-home-slot'); ?>
+<?php renderAd('leaderboard', ['placement' => 'homepage_top']); ?>
 
 <?php if (!empty($trending)): ?>
 <section class="section">
@@ -277,7 +277,7 @@ require_once __DIR__ . '/includes/ad.php';
         <a href="<?= e_link('/movies') ?>" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach ($trending as $movie):
+        <?php foreach ($trending as $index => $movie):
             $urgency = !empty($movie['first_showtime']) ? urgencyLabel(getMinutesUntil($movie['first_showtime'])) : null;
         ?>
         <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="poster-card"
@@ -303,10 +303,17 @@ require_once __DIR__ . '/includes/ad.php';
                 <span class="poster-card-badge accent">Rated <?= htmlspecialchars($movie['rating']) ?></span>
             <?php endif; ?>
         </a>
+        <?php if ($index === 5): ?>
+            <?php renderAd('large-rectangle', ['placement' => 'homepage_grid_inline']); ?>
+        <?php endif; ?>
         <?php endforeach; ?>
     </div>
 </section>
 <?php endif; ?>
+
+<?php renderAd('large-rectangle', ['placement' => 'homepage_trending_inline']); ?>
+
+<?php renderAd('leaderboard', ['placement' => 'homepage_cinemas_break']); ?>
 
 <?php if (!empty($cinemas)): ?>
 <section class="section">
@@ -360,7 +367,7 @@ require_once __DIR__ . '/includes/ad.php';
         <a href="<?= e_link('/movies') ?>" class="section-link">Browse movies</a>
     </div>
     <div class="poster-wall stagger">
-        <?php foreach ($upcoming as $movie): ?>
+        <?php foreach ($upcoming as $index => $movie): ?>
         <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="wall-card">
             <?php if (!empty($movie['poster_url'])): ?>
                 <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy">
@@ -374,12 +381,15 @@ require_once __DIR__ . '/includes/ad.php';
                 <?php endif; ?>
             </div>
         </a>
+        <?php if ($index === 5): ?>
+            <?php renderAd('large-rectangle', ['placement' => 'homepage_grid_inline']); ?>
+        <?php endif; ?>
         <?php endforeach; ?>
     </div>
 </section>
 <?php endif; ?>
 
-<?php renderAd('leaderboard', 'ad-mt-6 ad-mb-2 ad-home-slot'); ?>
+<?php renderAd('leaderboard', ['placement' => 'homepage_footer']); ?>
 </div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

@@ -159,6 +159,9 @@ include __DIR__ . '/includes/header.php';
                 <span class="poster-card-badge accent"><?= htmlspecialchars($m['rating']) ?></span>
             <?php endif; ?>
         </a>
+        <?php if ((($i + 1) % 8) === 0 && ($i + 1) < count($movies)): ?>
+            <?php renderAd('large-rectangle', ['placement' => 'movies_grid_inline']); ?>
+        <?php endif; ?>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>

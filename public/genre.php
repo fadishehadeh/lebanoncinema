@@ -142,7 +142,7 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<?php renderAd('leaderboard', 'ad-mt-2 ad-mb-4'); ?>
+<?php renderAd('leaderboard', ['placement' => 'genre_top']); ?>
 
 <!-- Cinemas showing this genre -->
 <?php if (!empty($cinemas)): ?>
@@ -197,7 +197,7 @@ $otherGenres = array_slice($otherGenres, 0, 6);
     </div>
 </section>
 
-<?php renderAd('leaderboard', 'ad-mt-4 ad-mb-2'); ?>
+<?php renderAd('leaderboard', ['placement' => 'genre_lower']); ?>
 
 </div><!-- end page-enter -->
 <?php include __DIR__ . '/includes/footer.php'; ?>

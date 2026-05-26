@@ -98,6 +98,8 @@ include __DIR__ . '/includes/header.php';
     </p>
 </div>
 
+<?php renderAd('leaderboard', ['placement' => 'showtimes_top']); ?>
+
 <?php if (empty($byCinema)): ?>
     <div class="empty-state"><p>No showtimes available for <?= htmlspecialchars($cityName) ?> today.</p></div>
 <?php else: ?>
@@ -159,7 +161,7 @@ include __DIR__ . '/includes/header.php';
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php renderAd('leaderboard', 'ad-mt-2 ad-mb-4'); ?>
+<?php renderAd('rectangle', ['placement' => 'showtimes_lower']); ?>
 
 <!-- SEO Content Block + Internal links -->
 <section class="section" style="padding:0 24px;">
