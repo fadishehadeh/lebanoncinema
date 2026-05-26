@@ -46,7 +46,7 @@ function renderAdPlaceholder(string $type, array $options): void {
 ?>
 <div class="ad-wrap <?= htmlspecialchars($classes) ?>" id="<?= $id ?>" data-ad-type="<?= $type ?>">
     <div class="ad-inner ad-<?= $type ?>">
-        <span class="ad-label">Sponsored</span>
+        <span class="ad-label">Ads</span>
         <div class="ad-skelly">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
             <span>Ad Space</span>
@@ -90,7 +90,7 @@ function renderAdsenseAd(string $type, array $options): void {
 ?>
 <div class="ad-wrap <?= htmlspecialchars($classes) ?>" id="<?= $id ?>-wrap">
     <div class="ad-inner ad-<?= $type ?>">
-        <span class="ad-label">Sponsored</span>
+        <span class="ad-label">Ads</span>
         <ins class="adsbygoogle"
              style="display:block"
              data-ad-client="<?= htmlspecialchars($client) ?>"
@@ -128,12 +128,12 @@ function renderAdsenseAd(string $type, array $options): void {
 
 function getAdConfig(string $type): array {
     $sizes = [
-        'leaderboard'        => ['label'=>'Sponsored', 'desk'=>[728,90], 'mob'=>[320,50]],
-        'mobile-leaderboard' => ['label'=>'Sponsored', 'desk'=>[320,50], 'mob'=>[320,50]],
-        'rectangle'          => ['label'=>'Sponsored', 'desk'=>[336,280], 'mob'=>[300,250]],
-        'large-rectangle'    => ['label'=>'Sponsored', 'desk'=>[336,280], 'mob'=>[300,250]],
-        'skyscraper'         => ['label'=>'Sponsored', 'desk'=>[300,600], 'mob'=>null],
-        'in-card'            => ['label'=>'Sponsored', 'desk'=>[160,240], 'mob'=>[120,200]],
+        'leaderboard'        => ['label'=>'Ads', 'desk'=>[728,90], 'mob'=>[320,50]],
+        'mobile-leaderboard' => ['label'=>'Ads', 'desk'=>[320,50], 'mob'=>[320,50]],
+        'rectangle'          => ['label'=>'Ads', 'desk'=>[336,280], 'mob'=>[300,250]],
+        'large-rectangle'    => ['label'=>'Ads', 'desk'=>[336,280], 'mob'=>[300,250]],
+        'skyscraper'         => ['label'=>'Ads', 'desk'=>[300,600], 'mob'=>null],
+        'in-card'            => ['label'=>'Ads', 'desk'=>[160,240], 'mob'=>[120,200]],
     ];
     return $sizes[$type] ?? $sizes['rectangle'];
 }
