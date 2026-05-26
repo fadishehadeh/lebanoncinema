@@ -1,11 +1,19 @@
 {
   "metadata": {
-    "scrapedAt": "2026-05-25T06:33:39.070Z",
-    "totalMovies": 42
+    "scrapedAt": "2026-05-26T05:16:32.581Z",
+    "totalMovies": 84
   },
   "movies": [
     {
       "movie": "7 Dogs",
+      "source": "Vox Cinemas"
+    },
+    {
+      "movie": "Chum",
+      "source": "Vox Cinemas"
+    },
+    {
+      "movie": "The Adventures of Shuke and Beita",
       "source": "Vox Cinemas"
     },
     {
@@ -26,6 +34,10 @@
     },
     {
       "movie": "Supergirl",
+      "source": "Vox Cinemas"
+    },
+    {
+      "movie": "Sakr w Canaria",
       "source": "Vox Cinemas"
     },
     {
@@ -51,6 +63,11 @@
     {
       "movie": "Dune: Part Three",
       "source": "Vox Cinemas"
+    },
+    {
+      "movie": "PITFALL",
+      "source": "Grand Cinema",
+      "slug": "pitfall"
     },
     {
       "movie": "FUZE",
@@ -127,18 +144,6 @@
       "source": "Cinema City"
     },
     {
-      "movie": "Chum",
-      "source": "Cinema City"
-    },
-    {
-      "movie": "Shrek's 25th Anniversary",
-      "source": "Cinema City"
-    },
-    {
-      "movie": "Pitfall",
-      "source": "Cinema City"
-    },
-    {
       "movie": "Scary Movie 6",
       "source": "Cinema City"
     },
@@ -185,6 +190,170 @@
     {
       "movie": "The Cat in the Hat",
       "source": "Cinema City"
+    },
+    {
+      "movie": "Shrek 5",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "The Furious",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Wild Horse Nine",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "The Adventures of Shuke & Beita",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Animal Friends",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Disclosure Day",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Minions 3",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Shiver",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Moana 2026",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Cut Off",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Spiderman Brand New Day",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Fall 2",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Super Troopers 3",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Paw Patrol the Dino Movie",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "The Rivals of Amziah King",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Munity",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Pressure",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Forgotten Island",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Digger",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "The Social Reckoning",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Archangel",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "The Great Beyond",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Ebenezer",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Focker In Law",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Violent Night 2",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Jumanji 3",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Avengers: Doomsday",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Dune Part Three",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Angry Birds 3",
+      "source": "Cinemall (Coming Soon)"
+    },
+    {
+      "movie": "Michael VIP",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Michael",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "The Devil Wears Prada 2",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "The Super Mario Galaxy Movie",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Star Wars The Mandalorian & Grogu",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "The Drama",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "ASAD أسد",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "In The Grey",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Passengers",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Obsession",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Billie Eilish – Hit Me Hard And Soft: The Tour",
+      "source": "Cinemall"
+    },
+    {
+      "movie": "Goat",
+      "source": "Cinemall"
     }
   ]
 }

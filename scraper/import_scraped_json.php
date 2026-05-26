@@ -305,8 +305,7 @@ function matchMovie(PDO $db, array $localMovies, string $searchTitle, string $no
 function autoCreateMovie(PDO $db, string $normalized, string $searchTitle): ?int {
     // Use the normalized title for the DB
     $title = ucwords($normalized);
-    // Fix articles
-    $title = preg_replace('/\b(The|A|An)\b/i', ucfirst, $title);
+    $title = preg_replace_callback('/\b(The|A|An)\b/i', function($m) { return $m[1]; }, $title);
     
     $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', trim($title)));
     $slug = trim($slug, '-');

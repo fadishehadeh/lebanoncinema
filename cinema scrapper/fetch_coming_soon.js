@@ -58,6 +58,28 @@ async function main() {
     console.log('  Found: ' + results.filter(r => r.source === 'Cinema City').length);
   } catch(e) { console.log('  Error: ' + e.message); }
   
+  // 4. Cinemall Coming Soon + Now Showing
+  try {
+    console.log('\n=== Cinemall ===');
+    const res = await axios.get('https://www.cine-mall.com/', { headers, timeout: 30000 });
+    const $ = cheerio.load(res.data);
+    // Coming soon
+    $('section.soon-part .title, section.part[data-id="2"] .title').each((i, el) => {
+      const title = $(el).text().trim();
+      if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+        results.push({ movie: title, source: 'Cinemall (Coming Soon)' });
+      }
+    });
+    // Also get now showing (in case they're not in other scrapers)
+    $('section.part[data-id="1"] .title').each((i, el) => {
+      const title = $(el).text().trim();
+      if (title && title.length > 2 && !results.some(r => r.movie.toLowerCase() === title.toLowerCase())) {
+        results.push({ movie: title, source: 'Cinemall' });
+      }
+    });
+    console.log('  Found: ' + results.filter(r => r.source && r.source.includes('Cinemall')).length);
+  } catch(e) { console.log('  Error: ' + e.message); }
+
   // Deduplicate by title
   const seen = new Set();
   const unique = results.filter(r => {
