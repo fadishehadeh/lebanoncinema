@@ -448,9 +448,7 @@ function renderAd(string $type = 'leaderboard', $options = []): void {
     }
 
     if (!$hasSlot) {
-        if ($runtime['debug']) {
-            renderAdPlaceholder($runtime, 'no-slot');
-        }
+        renderAdPlaceholder($runtime, 'no-slot');
         return;
     }
 
