@@ -87,33 +87,39 @@ function renderAdsenseAd(string $type, array $options): void {
     $client = defined('ADSENSE_CLIENT') ? ADSENSE_CLIENT : '';
     $id = 'ad-' . uniqid();
     $classes = $options['class'] ?? '';
+    $desktopWidth = $config['desk'][0] ?? null;
+    $desktopHeight = $config['desk'][1] ?? null;
+    $isFixedSize = in_array($type, ['leaderboard', 'mobile-leaderboard', 'rectangle', 'large-rectangle', 'skyscraper', 'in-card'], true);
 ?>
 <div class="ad-wrap <?= htmlspecialchars($classes) ?>" id="<?= $id ?>-wrap">
     <div class="ad-inner ad-<?= $type ?>">
         <span class="ad-label">Ads</span>
         <ins class="adsbygoogle"
-             style="display:block"
+             style="display:block;<?= ($isFixedSize && $desktopWidth && $desktopHeight) ? 'width:' . (int)$desktopWidth . 'px;height:' . (int)$desktopHeight . 'px;' : '' ?>"
              data-ad-client="<?= htmlspecialchars($client) ?>"
              data-ad-slot="<?= htmlspecialchars($slot) ?>"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+             <?= ($isFixedSize && $desktopWidth && $desktopHeight) ? 'data-ad-format="" data-full-width-responsive="false"' : 'data-ad-format="auto" data-full-width-responsive="true"' ?>></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 </div>
 <style>
     #<?= $id ?>-wrap { margin:0 auto; }
-    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg);     background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
+    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
     #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
     #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.45; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
-    .ad-leaderboard { width:728px; max-width:100%; height:90px; margin:0 auto; }
+    .ad-leaderboard { width:728px; max-width:728px; height:90px; min-height:90px; margin:0 auto; flex:0 0 auto; }
     .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; margin:0 auto; }
     .ad-rectangle { width:100%; max-width:336px; min-height:250px; margin:0 auto; }
     .ad-large-rectangle { width:100%; max-width:336px; min-height:280px; margin:0 auto; }
     .ad-skyscraper { width:100%; max-width:300px; min-height:600px; margin:0 auto; }
     .ad-in-card { width:160px; height:240px; flex-shrink:0; scroll-snap-align:start; }
     .ad-wrap .adsbygoogle { width:100%; height:100%; min-height:inherit; }
+    .ad-leaderboard .adsbygoogle,
+    #<?= $id ?>-wrap .ad-leaderboard .adsbygoogle { width:728px !important; height:90px !important; min-height:90px !important; }
     @media (max-width:768px) {
-        .ad-leaderboard { min-height:50px; }
+        .ad-leaderboard { width:320px; max-width:320px; height:50px; min-height:50px; }
+        .ad-leaderboard .adsbygoogle,
+        #<?= $id ?>-wrap .ad-leaderboard .adsbygoogle { width:320px !important; height:50px !important; min-height:50px !important; }
         .ad-rectangle, .ad-large-rectangle { max-width:100%; min-height:200px; }
         .ad-skyscraper { display:none; }
         .ad-in-card { width:120px; height:200px; }
