@@ -324,25 +324,25 @@ document.querySelectorAll('.chip[data-filter]').forEach(chip => {
 });
 
 function filterMovies(filter) {
-    document.querySelectorAll('[data-genres]').forEach(card => {
-        const genres = (card.dataset.genres || '').toLowerCase();
-        const formats = (card.dataset.formats || '').toLowerCase();
-        const urgency = parseInt(card.dataset.urgency || '-1');
+    var cards = document.querySelectorAll('[data-movie-item]');
+    for (var i = 0; i < cards.length; i++) {
+        var card = cards[i];
+        var genres = (card.getAttribute('data-genres') || '').toLowerCase();
+        var formats = (card.getAttribute('data-formats') || '').toLowerCase();
+        var urgency = parseInt(card.getAttribute('data-urgency') || '-1');
 
-        let show = false;
+        var show = false;
         switch (filter) {
             case 'all': show = true; break;
-            case 'soon': show = urgency >= 0 && urgency <= 90; break;
-            case 'vip': show = formats.includes('vip') || formats.includes('imax'); break;
-            case 'family': show = genres.includes('family') || genres.includes('animation'); break;
-            case 'action': show = genres.includes('action'); break;
-            case 'horror': show = genres.includes('horror'); break;
-            case 'comedy': show = genres.includes('comedy'); break;
+            case 'vip': show = formats.indexOf('vip') !== -1 || formats.indexOf('imax') !== -1; break;
+            case 'family': show = genres.indexOf('family') !== -1 || genres.indexOf('animation') !== -1; break;
+            case 'action': show = genres.indexOf('action') !== -1; break;
+            case 'horror': show = genres.indexOf('horror') !== -1; break;
+            case 'comedy': show = genres.indexOf('comedy') !== -1; break;
             default: show = true;
         }
-        const container = card.closest('[data-movie-item]') || card;
-        if (container) container.style.display = show ? '' : 'none';
-    });
+        card.style.display = show ? '' : 'none';
+    }
 }
 
 // ========== SMOOTH SCROLL ==========
