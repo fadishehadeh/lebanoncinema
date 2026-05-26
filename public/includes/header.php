@@ -1001,7 +1001,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: block;
         }
 
-        .detail-info { flex: 1; }
+        .detail-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .detail-title {
             font-size: 2.5rem;
@@ -1052,6 +1055,47 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+        }
+
+        .detail-cast {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+            max-width: 640px;
+        }
+        .detail-cast-member {
+            text-align: center;
+            min-width: 0;
+        }
+        .detail-cast-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 6px;
+            border: 2px solid var(--border);
+            display: block;
+        }
+        .detail-cast-avatar-fallback {
+            background: var(--card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .detail-cast-name {
+            font-size: 0.7rem;
+            font-weight: 600;
+            line-height: 1.25;
+            word-break: break-word;
+        }
+        .detail-cast-character {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            line-height: 1.25;
+            word-break: break-word;
         }
 
         /* ══════════════════════════════════════════════════
@@ -1541,8 +1585,12 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .carousel { padding: 0 16px; gap: 6px; }
             .chips-row { padding: 0 16px 12px; }
             .search-section { padding: 0 16px; }
-            .detail-hero { padding: 24px 16px; }
+            .detail-hero { padding: 24px 16px; gap: 20px; flex-direction: column; align-items: stretch; }
+            .detail-poster { width: min(220px, 56vw); margin: 0 auto; }
+            .detail-info { width: 100%; }
             .detail-title { font-size: 1.6rem; }
+            .detail-synopsis { max-width: none; }
+            .detail-cast { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: none; }
             .showtimes-wrap { padding: 0 16px 32px; }
             .cinema-detail-hero { padding: 24px 16px; }
             .section { margin-bottom: 24px; }
@@ -1557,6 +1605,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
             .poster-wall { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
             .cinema-card { width: 200px; padding: 16px; }
+            .detail-cast { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
     </style>
 

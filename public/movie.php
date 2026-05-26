@@ -303,16 +303,16 @@ include __DIR__ . '/includes/header.php';
 
         <?php if (!empty($movie['cast_json'])): $cast = json_decode($movie['cast_json'], true); ?>
         <?php if (!empty($cast)): ?>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
+        <div class="detail-cast">
             <?php foreach ($cast as $actor): ?>
-            <div style="text-align:center;width:70px;">
+            <div class="detail-cast-member">
                 <?php if ($actor['profile']): ?>
-                    <img src="<?= htmlspecialchars($actor['profile']) ?>" alt="<?= htmlspecialchars($actor['name']) ?>" style="width:50px;height:50px;border-radius:50%;object-fit:cover;margin-bottom:4px;border:2px solid var(--border);">
+                    <img src="<?= htmlspecialchars($actor['profile']) ?>" alt="<?= htmlspecialchars($actor['name']) ?>" class="detail-cast-avatar">
                 <?php else: ?>
-                    <div style="width:50px;height:50px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:0.75rem;color:var(--text-muted);"><?= htmlspecialchars(substr($actor['name'], 0, 2)) ?></div>
+                    <div class="detail-cast-avatar detail-cast-avatar-fallback"><?= htmlspecialchars(substr($actor['name'], 0, 2)) ?></div>
                 <?php endif; ?>
-                <div style="font-size:0.65rem;font-weight:600;line-height:1.2;"><?= htmlspecialchars($actor['name']) ?></div>
-                <div style="font-size:0.55rem;color:var(--text-muted);line-height:1.2;"><?= htmlspecialchars($actor['character']) ?></div>
+                <div class="detail-cast-name"><?= htmlspecialchars($actor['name']) ?></div>
+                <div class="detail-cast-character"><?= htmlspecialchars($actor['character']) ?></div>
             </div>
             <?php endforeach; ?>
         </div>
