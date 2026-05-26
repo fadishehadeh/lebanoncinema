@@ -143,8 +143,8 @@ include __DIR__ . '/includes/header.php';
                 </div>
                 <div class="hero-ctas">
                     <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="btn btn-primary">
-                        <i data-lucide="ticket"></i>
-                        Book Now
+                        <i data-lucide="eye"></i>
+                        View Showtimes
                     </a>
                     <?php if ($m['trailer_url']): ?>
                     <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="btn btn-outline">

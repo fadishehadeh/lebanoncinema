@@ -251,18 +251,11 @@ include __DIR__ . '/includes/header.php';
 
 <?php if ($urgencyBarData && $urgencyBarData['urgency']): ?>
 <div style="max-width:1200px;margin:0 auto;padding:0 24px;">
-    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border-strong);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px;animation:fadeUp 0.5s var(--ease);">
-        <div style="display:flex;align-items:center;gap:10px;">
-            <span style="padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;background:var(--accent);color:#000;">
-                <?= htmlspecialchars($urgencyBarData['urgency']['label']) ?>
-            </span>
-            <span style="font-size:0.85rem;color:var(--text-muted);">at <?= htmlspecialchars($urgencyBarData['cinema_name']) ?></span>
-        </div>
-        <a href="<?= htmlspecialchars($urgencyBarData['booking_url'] ?? '#') ?>"
-           target="<?= $urgencyBarData['booking_url'] ? '_blank' : '' ?>"
-           class="btn btn-primary" style="padding:10px 20px;font-size:0.85rem;">
-            Book Now
-        </a>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border-strong);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:24px;animation:fadeUp 0.5s var(--ease);">
+        <span style="padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:700;background:var(--accent);color:#000;">
+            <?= htmlspecialchars($urgencyBarData['urgency']['label']) ?>
+        </span>
+        <span style="font-size:0.85rem;color:var(--text-muted);">at <?= htmlspecialchars($urgencyBarData['cinema_name']) ?></span>
     </div>
 </div>
 <?php endif; ?>
