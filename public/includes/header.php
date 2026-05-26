@@ -193,13 +193,28 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .hero {
             position: relative;
             width: 100%;
-            height: calc(80vh + var(--nav-height));
-            min-height: calc(600px + var(--nav-height));
+            height: calc(72vh + var(--nav-height));
+            min-height: calc(560px + var(--nav-height));
             display: flex;
             align-items: flex-end;
             overflow: hidden;
             margin-top: calc(var(--nav-height) * -1);
-            margin-bottom: 24px;
+            margin-bottom: 10px;
+            background: radial-gradient(circle at top center, rgba(229,9,20,0.16), transparent 42%);
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.7s ease;
+            z-index: 0;
+            display: flex;
+            align-items: flex-end;
+        }
+        .hero-slide.active {
+            opacity: 1;
+            z-index: 1;
         }
 
         .hero-backdrop {
@@ -211,35 +226,50 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             width: 100%;
             height: 100%;
             object-fit: cover;
+            filter: saturate(0.95);
         }
         .hero-backdrop::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(90deg, rgba(5,5,5,0.85) 0%, rgba(5,5,5,0.4) 35%, transparent 60%),
-                        linear-gradient(0deg, rgba(5,5,5,1) 0%, rgba(5,5,5,0.2) 40%, transparent 60%);
+            background:
+                linear-gradient(90deg, rgba(5,5,5,0.92) 0%, rgba(5,5,5,0.68) 34%, rgba(5,5,5,0.2) 68%, rgba(5,5,5,0.8) 100%),
+                linear-gradient(180deg, rgba(5,5,5,0.28) 0%, rgba(5,5,5,0.82) 78%, rgba(5,5,5,1) 100%);
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 48px;
-            max-width: 1400px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 280px;
+            align-items: end;
+            gap: 32px;
+            max-width: 1320px;
             margin: 0 auto;
-            padding: 80px 48px 60px;
+            padding: 108px 48px 54px;
             width: 100%;
-            text-align: center;
+        }
+
+        .hero-stage {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 28px;
+            align-items: end;
+            padding: 26px;
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(8,8,8,0.42), rgba(8,8,8,0.76));
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 24px 90px rgba(0,0,0,0.45);
+            backdrop-filter: blur(10px);
         }
 
         .hero-poster {
             flex-shrink: 0;
-            width: 200px;
-            border-radius: var(--radius-md);
+            width: 100%;
+            border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+            box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+            background: rgba(255,255,255,0.03);
         }
         .hero-poster img {
             width: 100%;
@@ -247,53 +277,80 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             aspect-ratio: 2/3;
             object-fit: cover;
         }
+        .hero-poster-fallback {
+            width: 100%;
+            aspect-ratio: 2/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.4rem;
+            color: rgba(255,255,255,0.55);
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+        }
 
-        .hero-info { flex: 1; min-width: 0; max-width: 600px; display:flex; flex-direction:column; align-items:center; }
+        .hero-info {
+            min-width: 0;
+            max-width: 620px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
         .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 12px;
-            background: rgba(229,9,20,0.15);
-            border: 1px solid rgba(229,9,20,0.25);
-            border-radius: 4px;
+            padding: 6px 12px;
+            background: rgba(229,9,20,0.12);
+            border: 1px solid rgba(229,9,20,0.24);
+            border-radius: 999px;
             font-size: 0.65rem;
             font-weight: 700;
-            color: var(--accent);
+            color: #ffd2d5;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.12em;
             margin-bottom: 16px;
         }
 
         .hero-title {
-            font-size: 3rem;
+            font-size: clamp(2.4rem, 4.7vw, 4.4rem);
             margin-bottom: 12px;
-            letter-spacing: -0.02em;
-            line-height: 1.05;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+            max-width: 11ch;
         }
 
         .hero-tagline {
-            font-size: 1rem;
-            color: #b3b3b3;
-            margin-bottom: 20px;
-            max-width: 500px;
-            line-height: 1.5;
+            font-size: 0.98rem;
+            color: rgba(255,255,255,0.78);
+            margin-bottom: 18px;
+            max-width: 56ch;
+            line-height: 1.65;
         }
 
         .hero-meta {
             display: flex;
-            gap: 16px;
+            gap: 10px;
             align-items: center;
-            margin-bottom: 24px;
-            font-size: 0.85rem;
-            color: #b3b3b3;
+            margin-bottom: 22px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.76);
             flex-wrap: wrap;
         }
-        .hero-meta span { display: flex; align-items: center; gap: 6px; }
-        .hero-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: #666; }
+        .hero-meta span {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
 
-        .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+        .hero-ctas {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
 
         .btn {
             display: inline-flex;
@@ -331,7 +388,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
 
         .hero-quick-times {
-            margin-top: 20px;
+            margin-top: 18px;
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -339,25 +396,102 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
         .hero-quick-times .label {
             font-size: 0.7rem;
-            color: #b3b3b3;
+            color: rgba(255,255,255,0.66);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.12em;
             font-weight: 600;
         }
         .hero-time-chip {
-            padding: 6px 14px;
-            border-radius: 4px;
-            background: rgba(255,255,255,0.06);
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.8rem;
+            font-size: 0.76rem;
             font-weight: 500;
             transition: all 0.2s;
-            cursor: pointer;
             color: var(--text);
         }
         .hero-time-chip:hover {
             border-color: var(--accent);
             background: rgba(229,9,20,0.08);
+        }
+
+        .hero-queue {
+            display: grid;
+            gap: 10px;
+            align-self: stretch;
+        }
+        .hero-queue-item {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(8,8,8,0.55);
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s var(--ease);
+            backdrop-filter: blur(10px);
+        }
+        .hero-queue-item:hover,
+        .hero-queue-item.active {
+            border-color: rgba(229,9,20,0.32);
+            background: rgba(20,20,20,0.86);
+            color: var(--text);
+            transform: translateY(-2px);
+        }
+        .hero-queue-rank {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.42);
+        }
+        .hero-queue-copy {
+            min-width: 0;
+            display: grid;
+            gap: 3px;
+        }
+        .hero-queue-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .hero-queue-meta {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .hero-dots {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 8px;
+        }
+        .hero-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.45);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .hero-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        .hero-dot:hover {
+            border-color: #fff;
         }
 
         .hero-search-fallback {
@@ -378,10 +512,44 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         /* ══════════════════════════════════════════════════
            SEARCH
            ══════════════════════════════════════════════════ */
+        .home-discovery-shell {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 48px 20px;
+        }
+
         .search-section {
-            max-width: 640px;
-            margin: 0 auto 48px;
+            max-width: 1280px;
+            margin: 0 auto 18px;
             padding: 0 24px;
+        }
+
+        .search-section-home {
+            display: grid;
+            gap: 20px;
+            padding: 28px;
+            border-radius: 26px;
+            background: linear-gradient(180deg, rgba(15,15,15,0.96), rgba(10,10,10,0.96));
+            border: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.32);
+        }
+
+        .search-section-copy h2 {
+            font-size: clamp(1.35rem, 2.2vw, 2rem);
+            margin-bottom: 8px;
+        }
+        .search-section-copy p {
+            color: var(--text-muted);
+            max-width: 56ch;
+        }
+        .section-kicker {
+            display: inline-block;
+            margin-bottom: 10px;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #ff8f98;
+            font-weight: 700;
         }
 
         .search-wrap {
@@ -486,24 +654,23 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: flex;
             gap: 8px;
             overflow-x: auto;
-            padding: 0 24px 24px;
+            padding: 0;
             scroll-behavior: smooth;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            justify-content: center;
+            justify-content: flex-start;
         }
         .chips-row::-webkit-scrollbar { display: none; }
-        @media (max-width: 768px) { .chips-row { justify-content: flex-start; } }
 
         .chip {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             padding: 8px 18px;
-            border-radius: 20px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
+            border-radius: 999px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.72);
             font-size: 0.8rem;
             font-weight: 500;
             white-space: nowrap;
@@ -519,7 +686,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .chip.active {
             background: var(--accent);
             border-color: var(--accent);
-            color: #000;
+            color: #fff;
             font-weight: 600;
         }
 
@@ -527,30 +694,32 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            SECTION / CAROUSEL
            ══════════════════════════════════════════════════ */
         .section {
-            margin-bottom: 36px;
+            margin-bottom: 34px;
             position: relative;
         }
 
         .section-header {
             display: flex;
-            justify-content: flex-start;
-            align-items: center;
+            justify-content: space-between;
+            align-items: flex-end;
             padding: 0 48px;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
             gap: 16px;
         }
 
         .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.22rem;
+            font-weight: 700;
             color: var(--text);
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
 
         .section-link {
-            font-size: 0.8rem;
-            color: #b3b3b3;
-            font-weight: 400;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.58);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
             transition: color 0.2s;
         }
         .section-link:hover { color: var(--text); }
@@ -576,7 +745,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .carousel-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            gap: 18px;
             padding: 0 48px;
         }
         .carousel-grid .poster-card { width: 100%; }
@@ -601,19 +770,21 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             flex-shrink: 0;
             width: 200px;
             aspect-ratio: 2/3;
-            border-radius: var(--radius-sm);
+            border-radius: 18px;
             overflow: hidden;
             background: #111;
             scroll-snap-align: start;
             cursor: pointer;
             transition: all 0.3s var(--ease);
-            border: none;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 18px 36px rgba(0,0,0,0.24);
         }
         @media (min-width: 1400px) { .poster-card { width: 100%; } }
         @media (min-width: 1800px) { .poster-card { width: 100%; } }
         .poster-card:hover {
-            transform: translateY(-4px) scale(1.04);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            transform: translateY(-4px);
+            box-shadow: 0 22px 45px rgba(0,0,0,0.42);
+            border-color: rgba(255,255,255,0.12);
             z-index: 10;
         }
 
@@ -627,37 +798,38 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             transition: transform 0.4s var(--ease);
         }
         .poster-card:hover .poster-card-img {
-            transform: scale(1.06);
+            transform: scale(1.04);
         }
 
         .poster-card-overlay {
             position: absolute;
-            inset: 0;
+            inset: auto 0 0 0;
             background: linear-gradient(to top,
-                rgba(0,0,0,0.95) 0%,
-                rgba(0,0,0,0.3) 45%,
-                transparent 70%
+                rgba(6,6,6,0.96) 0%,
+                rgba(6,6,6,0.72) 62%,
+                rgba(6,6,6,0.04) 100%
             );
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 12px;
-            opacity: 0;
-            transition: opacity 0.25s var(--ease);
+            padding: 40px 14px 14px;
+            opacity: 1;
+            transition: transform 0.25s var(--ease);
             z-index: 2;
             pointer-events: none;
         }
         .poster-card:hover .poster-card-overlay {
-            opacity: 1;
+            transform: translateY(-2px);
         }
         .poster-card-overlay .poster-card-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 4px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.2;
         }
         .poster-card-overlay .poster-card-meta {
-            font-size: 0.7rem;
-            color: #b3b3b3;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.68);
         }
 
         .default-overlay {
@@ -688,56 +860,6 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .poster-card-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
         .poster-card-meta { font-size: 0.7rem; color: #b3b3b3; }
 
-        .poster-card-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.6rem;
-            font-weight: 700;
-            z-index: 3;
-        }
-        .poster-card:hover {
-            border-color: var(--border-strong);
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: var(--shadow-card);
-        }
-
-        .poster-card-img {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.4s var(--ease);
-        }
-        .poster-card:hover .poster-card-img {
-            transform: scale(1.06);
-        }
-
-        .poster-card-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top,
-                rgba(11,11,15,0.95) 0%,
-                rgba(11,11,15,0.3) 50%,
-                transparent 70%
-            );
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 14px;
-            opacity: 0;
-            transition: opacity 0.3s var(--ease);
-            z-index: 2;
-            pointer-events: none;
-        }
-        .poster-card:hover .poster-card-overlay {
-            opacity: 1;
-        }
-
         .default-overlay {
             position: absolute;
             inset: 0;
@@ -755,31 +877,32 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
 
         .poster-card-title {
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.92rem;
+            font-weight: 700;
             margin-bottom: 4px;
         }
         .poster-card-meta {
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
         }
 
         .poster-card-badge {
             position: absolute;
             top: 10px;
-            right: 10px;
-            padding: 4px 10px;
-            border-radius: 6px;
-            z-index: 3;
-            font-size: 0.6rem;
+            left: 10px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            z-index: 2;
+            font-size: 0.58rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            z-index: 2;
+            letter-spacing: 0.08em;
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(12px);
         }
         .poster-card-badge.accent {
             background: var(--accent);
-            color: #000;
+            color: #fff;
         }
         .poster-card-badge.blue {
             background: var(--accent-blue);
@@ -813,7 +936,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            ══════════════════════════════════════════════════ */
         .cinema-scroll {
             display: flex;
-            gap: 12px;
+            gap: 14px;
             overflow-x: auto;
             padding: 0 24px 8px;
             scrollbar-width: none;
@@ -822,26 +945,27 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 
         .cinema-card {
             flex-shrink: 0;
-            width: 280px;
+            width: 308px;
             padding: 20px;
-            border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, var(--card) 0%, var(--surface2) 100%);
-            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(17,17,17,0.98) 0%, rgba(10,10,10,0.98) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
             transition: all 0.35s var(--ease);
             cursor: pointer;
             scroll-snap-align: start;
         }
         .cinema-card:hover {
-            border-color: rgba(94,139,255,0.15);
+            border-color: rgba(229,9,20,0.18);
             transform: translateY(-4px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(94,139,255,0.06);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(229,9,20,0.06);
         }
 
         .cinema-card-top {
             display: flex;
-            align-items: center;
+            justify-content: space-between;
+            align-items: flex-start;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         .cinema-dot {
             width: 10px;
@@ -849,38 +973,84 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             border-radius: 50%;
             flex-shrink: 0;
         }
+        .cinema-card-chain {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.5);
+            font-weight: 700;
+        }
         .cinema-card-name {
-            font-size: 0.95rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             flex: 1;
         }
         .cinema-card-detail {
             font-size: 0.8rem;
             color: var(--text-muted);
+            margin-bottom: 16px;
+            min-height: 20px;
+        }
+        .cinema-card-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
             margin-bottom: 12px;
+        }
+        .cinema-stat-value {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            line-height: 1;
+        }
+        .cinema-stat-label {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.46);
         }
         .cinema-card-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.58);
+            font-weight: 700;
         }
         .cinema-card-badges {
             display: flex;
-            gap: 4px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
         .mini-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.6rem;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.58rem;
             font-weight: 700;
             background: rgba(255,255,255,0.06);
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.7);
             text-transform: uppercase;
         }
         .cinema-card-next {
-            font-size: 0.75rem;
-            color: var(--accent);
+            font-size: 0.68rem;
+            color: #ffd2d5;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(229,9,20,0.14);
+            border: 1px solid rgba(229,9,20,0.18);
             font-weight: 600;
+            white-space: nowrap;
         }
 
         /* ══════════════════════════════════════════════════
@@ -888,23 +1058,23 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            ══════════════════════════════════════════════════ */
         .poster-wall {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+            gap: 14px;
             padding: 0 24px;
         }
 
         .wall-card {
-            border-radius: var(--radius-md);
+            border-radius: 16px;
             overflow: hidden;
-            background: var(--card);
+            background: linear-gradient(180deg, rgba(17,17,17,0.98), rgba(10,10,10,0.98));
             cursor: pointer;
             transition: all 0.35s var(--ease);
-            border: 1px solid rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .wall-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(255,45,111,0.06);
-            border-color: rgba(255,45,111,0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5), 0 0 30px rgba(255,45,111,0.05);
+            border-color: rgba(255,255,255,0.12);
         }
         .wall-card img {
             width: 100%;
@@ -913,13 +1083,23 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: block;
             transition: transform 0.5s var(--ease);
         }
-        .wall-card:hover img { transform: scale(1.06); }
+        .wall-card:hover img { transform: scale(1.04); }
+        .wall-card-fallback {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.55);
+            font-size: 2rem;
+        }
         .wall-card-info {
-            padding: 10px 12px;
+            padding: 11px 12px 12px;
         }
         .wall-card-title {
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1544,6 +1724,10 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         .ad-mb-2 { margin-bottom: 16px; }
         .ad-mb-6 { margin-bottom: 40px; }
         .ad-inline { flex-shrink: 0; }
+        .ad-home-slot {
+            max-width: 1320px;
+            padding: 0 48px;
+        }
 
         /* ══════════════════════════════════════════════════
            PAGE TRANSITIONS
@@ -1557,13 +1741,15 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
            ══════════════════════════════════════════════════ */
         @media (max-width: 900px) {
             .topnav { padding: 0 24px; }
-            .hero-content { padding: 60px 24px 40px; }
-            .hero-poster { width: 140px; }
-            .hero-title { font-size: 2rem; }
+            .hero-content { grid-template-columns: 1fr; padding: 92px 24px 44px; }
+            .hero-stage { grid-template-columns: 180px minmax(0, 1fr); gap: 22px; padding: 22px; }
+            .hero-title { font-size: 2.4rem; }
+            .home-discovery-shell { padding: 0 24px 18px; }
             .section-header { padding: 0 24px; }
             .carousel { padding: 0 24px; }
             .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
             .footer { padding: 40px 24px 20px; }
+            .ad-home-slot { padding: 0 24px; }
         }
 
         @media (max-width: 768px) {
@@ -1572,19 +1758,29 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .nav-links { display: none; }
             .hamburger { display: flex; }
             .brand { font-size: 1rem; }
-            .hero { height: calc(60vh + var(--nav-height)); min-height: calc(400px + var(--nav-height)); margin-bottom: 16px; margin-top: calc(var(--nav-height) * -1); }
-            .hero-content { padding: 48px 16px 32px; gap: 24px; flex-direction: column; align-items: flex-start; }
-            .hero-poster { width: 120px; display: none; }
-            .hero-title { font-size: 1.6rem; }
-            .hero-tagline { font-size: 0.85rem; }
+            .hero { height: auto; min-height: calc(520px + var(--nav-height)); margin-bottom: 12px; margin-top: calc(var(--nav-height) * -1); }
+            .hero-content { grid-template-columns: 1fr; padding: 82px 16px 48px; gap: 18px; }
+            .hero-stage { grid-template-columns: 1fr; gap: 18px; padding: 18px; border-radius: 22px; }
+            .hero-poster { width: min(220px, 48vw); margin: 0 auto; }
+            .hero-info { max-width: none; }
+            .hero-title { font-size: 2rem; max-width: none; }
+            .hero-tagline { font-size: 0.9rem; max-width: none; }
+            .hero-meta { gap: 8px; margin-bottom: 18px; }
+            .hero-ctas { width: 100%; }
+            .hero-ctas .btn { justify-content: center; flex: 1 1 180px; }
+            .hero-queue { grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); overflow-x: auto; padding-bottom: 4px; }
+            .hero-queue-item { min-width: 220px; }
+            .hero-dots { bottom: 12px; }
             .poster-card { width: 160px; }
-            .cinema-card { width: 240px; }
+            .cinema-card { width: 268px; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; padding: 0 16px; }
             .poster-wall { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); padding: 0 16px; }
             .section-header { padding: 0 16px; }
             .carousel { padding: 0 16px; gap: 6px; }
-            .chips-row { padding: 0 16px 12px; }
-            .search-section { padding: 0 16px; }
+            .home-discovery-shell { padding: 0 16px 16px; }
+            .search-section { padding: 0; }
+            .search-section-home { padding: 20px; border-radius: 22px; }
+            .chips-row { padding: 0; }
             .detail-hero { padding: 24px 16px; gap: 20px; flex-direction: column; align-items: stretch; }
             .detail-poster { width: min(220px, 56vw); margin: 0 auto; }
             .detail-info { width: 100%; }
@@ -1598,13 +1794,18 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .hero-search-fallback h1 { font-size: 1.6rem; }
             .footer-inner { grid-template-columns: 1fr 1fr; gap: 24px; }
             .footer { padding: 32px 16px 16px; }
+            .ad-home-slot { padding: 0 16px; }
         }
 
         @media (max-width: 480px) {
+            .hero-title { font-size: 1.72rem; }
+            .hero-stage { padding: 16px; }
+            .hero-poster { width: min(190px, 58vw); }
+            .hero-queue-item { min-width: 200px; }
             .poster-card { width: 120px; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
             .poster-wall { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
-            .cinema-card { width: 200px; padding: 16px; }
+            .cinema-card { width: 220px; padding: 16px; }
             .detail-cast { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
     </style>

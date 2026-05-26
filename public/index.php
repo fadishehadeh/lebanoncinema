@@ -3,21 +3,25 @@ require_once __DIR__ . '/../config.php';
 
 $db = getDbConnection();
 
-// Helper: minutes until a time
 function getMinutesUntil(string $timeStr): int {
     $now = time();
     $ts = strtotime(date('Y-m-d') . ' ' . $timeStr);
-    return (int)(($ts - $now) / 60);
+    return (int) (($ts - $now) / 60);
 }
 
 function urgencyLabel(int $mins): ?array {
-    if ($mins < 0) return null;
-    if ($mins <= 30) return ['class' => 'accent', 'label' => "Starting in {$mins} min"];
-    if ($mins <= 90) return ['class' => 'orange', 'label' => 'Starting in ' . ceil($mins/60) . 'h'];
+    if ($mins < 0) {
+        return null;
+    }
+    if ($mins <= 30) {
+        return ['class' => 'accent', 'label' => "Starting in {$mins} min"];
+    }
+    if ($mins <= 90) {
+        return ['class' => 'orange', 'label' => 'Starting in ' . ceil($mins / 60) . 'h'];
+    }
     return null;
 }
 
-// HERO CAROUSEL: Top 5 movies today
 $stmt = $db->prepare("
     SELECT m.*, COUNT(s.id) AS showtime_count,
            GROUP_CONCAT(DISTINCT s.show_time ORDER BY s.show_time SEPARATOR ',') AS hero_times
@@ -31,7 +35,6 @@ $stmt = $db->prepare("
 $stmt->execute();
 $heroMovies = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
 
-// TRENDING TONIGHT
 $stmt = $db->prepare("
     SELECT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min,
            COUNT(s.id) AS showtime_count,
@@ -49,7 +52,6 @@ $stmt = $db->prepare("
 $stmt->execute();
 $trending = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
 
-// STARTING SOON
 $stmt = $db->prepare("
     SELECT DISTINCT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min,
            MIN(s.show_time) AS next_showtime,
@@ -69,7 +71,6 @@ $stmt = $db->prepare("
 $stmt->execute();
 $startingSoon = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
 
-// CINEMAS NEAR YOU (all active cinemas)
 $stmt = $db->prepare("
     SELECT c.id, c.name, c.slug, c.city, c.area,
            c.has_imax, c.has_vip, c.has_4dx,
@@ -87,7 +88,6 @@ $stmt = $db->prepare("
 $stmt->execute();
 $cinemas = $stmt->fetchAll() ?? [];
 
-// UPCOMING RELEASES
 $stmt = $db->prepare("
     SELECT * FROM movies
     WHERE status = 'coming_soon'
@@ -97,125 +97,144 @@ $stmt = $db->prepare("
 $stmt->execute();
 $upcoming = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
 
-$pageTitle = 'Movies Showing Today in Lebanon — ' . SITE_NAME;
+$pageTitle = 'Movies Showing Today in Lebanon - ' . SITE_NAME;
 $pageDescription = 'Find movies playing today at cinemas across Lebanon. Browse showtimes for VOX, Grand, Empire, CinemaCity and more. Watch trailers, check schedules, and book cinema tickets online.';
 $showSkeleton = true;
 $breadcrumbs = [];
 include __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/ad.php';
 ?>
 
 <div class="page-enter">
-
-<?php require_once __DIR__ . '/includes/ad.php'; ?>
-
 <?php if (!empty($heroMovies)): ?>
-<!-- ════════════════════ HERO CAROUSEL ════════════════════ -->
 <section class="hero" id="hero-carousel">
-    <?php foreach ($heroMovies as $i => $m): ?>
-    <div class="hero-slide <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>">
+    <?php foreach ($heroMovies as $i => $movie): ?>
+    <article class="hero-slide <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>">
         <div class="hero-backdrop">
-            <?php $bg = $m['backdrop'] ?: $m['poster_url']; ?>
+            <?php $bg = $movie['backdrop'] ?: $movie['poster_url']; ?>
             <?php if ($bg): ?>
                 <img src="<?= htmlspecialchars($bg) ?>" alt="">
             <?php endif; ?>
         </div>
         <div class="hero-content fade-up">
-            <div class="hero-poster">
-                <?php if ($m['poster_url']): ?>
-                    <img src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>">
-                <?php else: ?>
-                    <div style="width:100%;height:100%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--text-muted);"><?= htmlspecialchars(substr($m['title'], 0, 1)) ?></div>
-                <?php endif; ?>
-            </div>
-            <div class="hero-info">
-                <div class="hero-badge">
-                    <i data-lucide="trending-up" style="width:14px;height:14px;"></i>
-                    #<?= $i + 1 ?> Trending
-                </div>
-                <h1 class="hero-title"><?= htmlspecialchars($m['title']) ?></h1>
-                <?php if ($m['synopsis']): ?>
-                    <p class="hero-tagline"><?= htmlspecialchars(substr($m['synopsis'], 0, 200)) ?></p>
-                <?php endif; ?>
-                <div class="hero-meta">
-                    <?php if ($m['release_date']): ?><span><?= date('Y', strtotime($m['release_date'])) ?></span><span class="dot"></span><?php endif; ?>
-                    <?php if ($m['duration_min']): ?><span><?= (int)$m['duration_min'] ?> min</span><span class="dot"></span><?php endif; ?>
-                    <?php if ($m['rating']): ?><span>⭐ <?= htmlspecialchars($m['rating']) ?></span><?php endif; ?>
-                </div>
-                <div class="hero-ctas">
-                    <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="btn btn-primary">
-                        <i data-lucide="eye"></i>
-                        View Showtimes
-                    </a>
-                    <?php if ($m['trailer_url']): ?>
-                    <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="btn btn-outline">
-                        <i data-lucide="play"></i>
-                        Watch Trailer
-                    </a>
+            <div class="hero-stage">
+                <div class="hero-poster">
+                    <?php if ($movie['poster_url']): ?>
+                        <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>">
+                    <?php else: ?>
+                        <div class="hero-poster-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
                     <?php endif; ?>
-                    <button class="btn btn-outline watchlist-btn" data-slug="<?= htmlspecialchars($m['slug']) ?>" style="padding:12px 16px;">
-                        <i data-lucide="heart"></i>
-                    </button>
                 </div>
-                <?php if (!empty($m['hero_times'])): ?>
-                <div class="hero-quick-times">
-                    <span class="label">Showtimes</span>
-                    <?php
-                    $times = explode(',', $m['hero_times']);
-                    $shown = 0;
-                    foreach ($times as $t):
-                        if ($shown >= 4) break;
-                        $mins = getMinutesUntil($t);
-                        if ($mins < -60) continue;
-                        $shown++;
-                    ?><span class="hero-time-chip"><?= date('g:i a', strtotime($t)) ?></span>
-                    <?php endforeach; ?>
+                <div class="hero-info">
+                    <div class="hero-badge">
+                        <i data-lucide="clapperboard" style="width:14px;height:14px;"></i>
+                        Featured Tonight
+                    </div>
+                    <h1 class="hero-title"><?= htmlspecialchars($movie['title']) ?></h1>
+                    <?php if (!empty($movie['synopsis'])): ?>
+                        <p class="hero-tagline"><?= htmlspecialchars(substr($movie['synopsis'], 0, 150)) ?></p>
+                    <?php else: ?>
+                        <p class="hero-tagline">Browse what is playing today, compare showtimes, and pick a cinema without digging through clutter.</p>
+                    <?php endif; ?>
+                    <div class="hero-meta">
+                        <?php if (!empty($movie['release_date'])): ?><span><?= date('Y', strtotime($movie['release_date'])) ?></span><?php endif; ?>
+                        <?php if (!empty($movie['duration_min'])): ?><span><?= (int) $movie['duration_min'] ?> min</span><?php endif; ?>
+                        <?php if (!empty($movie['rating'])): ?><span>Rating <?= htmlspecialchars($movie['rating']) ?></span><?php endif; ?>
+                        <?php if (!empty($movie['genres'])): ?><span><?= htmlspecialchars(substr($movie['genres'], 0, 24)) ?></span><?php endif; ?>
+                    </div>
+                    <div class="hero-ctas">
+                        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="btn btn-primary">
+                            <i data-lucide="ticket"></i>
+                            View Showtimes
+                        </a>
+                        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="btn btn-outline">
+                            <i data-lucide="<?= !empty($movie['trailer_url']) ? 'play' : 'film' ?>"></i>
+                            <?= !empty($movie['trailer_url']) ? 'Watch Trailer' : 'Movie Details' ?>
+                        </a>
+                    </div>
+                    <?php if (!empty($movie['hero_times'])): ?>
+                    <div class="hero-quick-times">
+                        <span class="label">Today</span>
+                        <?php
+                        $times = explode(',', $movie['hero_times']);
+                        $shown = 0;
+                        foreach ($times as $time):
+                            if ($shown >= 4) {
+                                break;
+                            }
+                            $mins = getMinutesUntil($time);
+                            if ($mins < -60) {
+                                continue;
+                            }
+                            $shown++;
+                        ?>
+                            <span class="hero-time-chip"><?= date('g:i a', strtotime($time)) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </div>
+            <?php if (count($heroMovies) > 1): ?>
+            <div class="hero-queue" aria-label="More featured movies">
+                <?php foreach ($heroMovies as $queueIndex => $queueMovie): ?>
+                <button class="hero-queue-item <?= $queueIndex === 0 ? 'active' : '' ?>" data-slide="<?= $queueIndex ?>" type="button">
+                    <span class="hero-queue-rank"><?= str_pad((string) ($queueIndex + 1), 2, '0', STR_PAD_LEFT) ?></span>
+                    <span class="hero-queue-copy">
+                        <span class="hero-queue-title"><?= htmlspecialchars($queueMovie['title']) ?></span>
+                        <span class="hero-queue-meta">
+                            <?= !empty($queueMovie['genres']) ? htmlspecialchars(substr($queueMovie['genres'], 0, 24)) : 'Showing today' ?>
+                        </span>
+                    </span>
+                </button>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
-    </div>
+    </article>
     <?php endforeach; ?>
-    <!-- Hero nav dots -->
     <div class="hero-dots">
-        <?php foreach ($heroMovies as $i => $m): ?>
+        <?php foreach ($heroMovies as $i => $movie): ?>
         <button class="hero-dot <?= $i === 0 ? 'active' : '' ?>" data-slide="<?= $i ?>" aria-label="Slide <?= $i + 1 ?>"></button>
         <?php endforeach; ?>
     </div>
 </section>
-<style>
-.hero-slide { position:absolute; inset:0; opacity:0; transition:opacity 0.8s ease; z-index:0; display:flex; align-items:flex-end; }
-.hero-slide.active { opacity:1; z-index:1; }
-.hero-dots { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:10; display:flex; gap:8px; }
-.hero-dot { width:10px; height:10px; border-radius:50%; border:2px solid rgba(255,255,255,0.5); background:transparent; cursor:pointer; transition:all 0.3s; padding:0; }
-.hero-dot.active { background:#E50914; border-color:#E50914; }
-.hero-dot:hover { border-color:#fff; }
-@media (max-width:768px) { .hero-dots { bottom:12px; } .hero-dot { width:8px; height:8px; } }
-</style>
 <script>
 (function() {
     var slides = document.querySelectorAll('#hero-carousel .hero-slide');
     var dots = document.querySelectorAll('#hero-carousel .hero-dot');
+    var queueItems = document.querySelectorAll('#hero-carousel .hero-queue-item');
     if (!slides.length) return;
     var current = 0;
     var timer;
-    function showSlide(idx) {
-        slides.forEach(function(s, i) { s.classList.toggle('active', i === idx); });
-        dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
-        current = idx;
+    function showSlide(index) {
+        slides.forEach(function(slide, slideIndex) { slide.classList.toggle('active', slideIndex === index); });
+        dots.forEach(function(dot, dotIndex) { dot.classList.toggle('active', dotIndex === index); });
+        queueItems.forEach(function(item, itemIndex) { item.classList.toggle('active', itemIndex === index); });
+        current = index;
+    }
+    function restartTimer() {
+        clearInterval(timer);
+        timer = setInterval(nextSlide, 7000);
+    }
+    function nextSlide() {
+        showSlide((current + 1) % slides.length);
     }
     dots.forEach(function(dot) {
         dot.addEventListener('click', function() {
-            clearInterval(timer);
-            showSlide(parseInt(this.getAttribute('data-slide')));
-            timer = setInterval(nextSlide, 6000);
+            showSlide(parseInt(this.getAttribute('data-slide'), 10));
+            restartTimer();
         });
     });
-    function nextSlide() { showSlide((current + 1) % slides.length); }
-    timer = setInterval(nextSlide, 6000);
+    queueItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            showSlide(parseInt(this.getAttribute('data-slide'), 10));
+            restartTimer();
+        });
+    });
+    restartTimer();
 })();
 </script>
 <?php else: ?>
-<!-- HERO (fallback) -->
 <section class="hero" style="min-height:40vh;">
     <div class="hero-content" style="justify-content:center;">
         <div class="hero-search-fallback">
@@ -226,29 +245,31 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- AD PLACEMENT 1: Below Hero -->
-<?php renderAd('leaderboard', 'ad-mt-4 ad-mb-6'); ?>
-
-<!-- ════════════════════ SEARCH ════════════════════ -->
-<div class="search-section">
-    <div class="search-wrap">
-        <input class="search-input" id="hero-search" placeholder="Search movies, cinemas, genres..." autocomplete="off">
-        <div class="search-icon"><i data-lucide="search"></i></div>
-        <div class="search-dropdown" id="search-dropdown"></div>
+<section class="home-discovery-shell">
+    <div class="search-section search-section-home">
+        <div class="search-section-copy">
+            <span class="section-kicker">Start Fast</span>
+            <h2>Search a movie, cinema, or genre</h2>
+            <p>Jump straight into tonight's lineup or narrow the page by format and mood.</p>
+        </div>
+        <div class="search-wrap">
+            <input class="search-input" id="hero-search" placeholder="Search movies, cinemas, genres..." autocomplete="off">
+            <div class="search-icon"><i data-lucide="search"></i></div>
+            <div class="search-dropdown" id="search-dropdown"></div>
+        </div>
+        <div class="chips-row">
+            <button class="chip active" data-filter="all">All Movies</button>
+            <button class="chip" data-filter="vip">VIP & IMAX</button>
+            <button class="chip" data-filter="action">Action</button>
+            <button class="chip" data-filter="comedy">Comedy</button>
+            <button class="chip" data-filter="horror">Horror</button>
+            <button class="chip" data-filter="family">Family</button>
+        </div>
     </div>
-</div>
+</section>
 
-<!-- ════════════════════ DISCOVERY CHIPS ════════════════════ -->
-<div class="chips-row">
-    <button class="chip active" data-filter="all">All</button>
-    <button class="chip" data-filter="vip">VIP & IMAX</button>
-    <button class="chip" data-filter="action">Action</button>
-    <button class="chip" data-filter="comedy">Comedy</button>
-    <button class="chip" data-filter="horror">Horror</button>
-    <button class="chip" data-filter="family">Family</button>
-</div>
+<?php renderAd('leaderboard', 'ad-mt-2 ad-mb-6 ad-home-slot'); ?>
 
-<!-- ════════════════════ TRENDING TONIGHT ════════════════════ -->
 <?php if (!empty($trending)): ?>
 <section class="section">
     <div class="section-header">
@@ -256,32 +277,30 @@ include __DIR__ . '/includes/header.php';
         <a href="<?= e_link('/movies') ?>" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach (array_slice($trending, 0, 20) as $i => $m):
-            $urgency = $m['first_showtime'] ? urgencyLabel(getMinutesUntil($m['first_showtime'])) : null;
+        <?php foreach ($trending as $movie):
+            $urgency = !empty($movie['first_showtime']) ? urgencyLabel(getMinutesUntil($movie['first_showtime'])) : null;
         ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
+        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="poster-card"
            data-movie-item
-           data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"
-           data-formats="<?= ($m['has_imax'] ? 'imax,' : '') . ($m['has_vip'] ? 'vip,' : '') ?>"
-           data-urgency="<?= $m['first_showtime'] ? getMinutesUntil($m['first_showtime']) : -1 ?>">
-            <?php if ($m['poster_url']): ?>
-                <img class="poster-card-img" src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
+           data-genres="<?= htmlspecialchars(strtolower($movie['genres'] ?? '')) ?>"
+           data-formats="<?= ($movie['has_imax'] ? 'imax,' : '') . ($movie['has_vip'] ? 'vip,' : '') ?>"
+           data-urgency="<?= !empty($movie['first_showtime']) ? getMinutesUntil($movie['first_showtime']) : -1 ?>">
+            <?php if (!empty($movie['poster_url'])): ?>
+                <img class="poster-card-img" src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy">
             <?php else: ?>
-                <div class="poster-card-img" style="background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:2.5rem;">
-                    <?= htmlspecialchars(substr($m['title'], 0, 1)) ?>
-                </div>
+                <div class="poster-card-img poster-card-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
             <?php endif; ?>
             <div class="poster-card-overlay">
-                <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
+                <div class="poster-card-title"><?= htmlspecialchars($movie['title']) ?></div>
                 <div class="poster-card-meta">
-                    <?php if ($m['genres']): ?><?= htmlspecialchars(substr($m['genres'], 0, 30)) ?><?php endif; ?>
+                    <?php if (!empty($movie['genres'])): ?><?= htmlspecialchars(substr($movie['genres'], 0, 30)) ?><?php endif; ?>
+                    <?php if (!empty($movie['duration_min'])): ?><?= !empty($movie['genres']) ? ' • ' : '' ?><?= (int) $movie['duration_min'] ?> min<?php endif; ?>
                 </div>
             </div>
-            <?php if ($m['rating']): ?>
-                <span class="poster-card-badge accent"><?= htmlspecialchars($m['rating']) ?></span>
-            <?php endif; ?>
             <?php if ($urgency): ?>
                 <span class="poster-card-badge <?= $urgency['class'] ?>"><?= htmlspecialchars($urgency['label']) ?></span>
+            <?php elseif (!empty($movie['rating'])): ?>
+                <span class="poster-card-badge accent">Rated <?= htmlspecialchars($movie['rating']) ?></span>
             <?php endif; ?>
         </a>
         <?php endforeach; ?>
@@ -289,7 +308,6 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- ════════════════════ CINEMAS NEAR YOU ════════════════════ -->
 <?php if (!empty($cinemas)): ?>
 <section class="section">
     <div class="section-header">
@@ -297,25 +315,37 @@ include __DIR__ . '/includes/header.php';
         <a href="<?= e_link('/cinemas') ?>" class="section-link">See all</a>
     </div>
     <div class="cinema-scroll stagger">
-        <?php foreach ($cinemas as $c): ?>
-         <a href="<?= e_link('/cinemas/' . rawurlencode($c['slug'])) ?>" class="cinema-card">
+        <?php foreach ($cinemas as $cinema): ?>
+        <a href="<?= e_link('/cinemas/' . rawurlencode($cinema['slug'])) ?>" class="cinema-card">
             <div class="cinema-card-top">
-                <div class="cinema-dot" style="background:<?= htmlspecialchars($c['color_hex']) ?>"></div>
-                <div class="cinema-card-name"><?= htmlspecialchars($c['name']) ?></div>
+                <div>
+                    <div class="cinema-card-chain">
+                        <span class="cinema-dot" style="background:<?= htmlspecialchars($cinema['color_hex']) ?>"></span>
+                        <?= htmlspecialchars($cinema['chain_name']) ?>
+                    </div>
+                    <div class="cinema-card-name"><?= htmlspecialchars($cinema['name']) ?></div>
+                </div>
+                <?php if (!empty($cinema['next_showtime'])): ?>
+                    <span class="cinema-card-next">Next <?= date('g:i a', strtotime($cinema['next_showtime'])) ?></span>
+                <?php endif; ?>
             </div>
             <div class="cinema-card-detail">
-                <?= htmlspecialchars($c['chain_name']) ?>
-                <?php if ($c['movies_today']): ?> · <?= (int)$c['movies_today'] ?> movies today<?php endif; ?>
+                <?= htmlspecialchars(trim(($cinema['area'] ?: '') . ($cinema['city'] ? ', ' . $cinema['city'] : ''))) ?>
+            </div>
+            <div class="cinema-card-stats">
+                <div>
+                    <span class="cinema-stat-value"><?= (int) ($cinema['movies_today'] ?? 0) ?></span>
+                    <span class="cinema-stat-label">movies today</span>
+                </div>
+                <div class="cinema-card-badges">
+                    <?php if (!empty($cinema['has_imax'])): ?><span class="mini-badge">IMAX</span><?php endif; ?>
+                    <?php if (!empty($cinema['has_vip'])): ?><span class="mini-badge">VIP</span><?php endif; ?>
+                    <?php if (!empty($cinema['has_4dx'])): ?><span class="mini-badge">4DX</span><?php endif; ?>
+                </div>
             </div>
             <div class="cinema-card-footer">
-                <div class="cinema-card-badges">
-                    <?php if ($c['has_imax']): ?><span class="mini-badge">IMAX</span><?php endif; ?>
-                    <?php if ($c['has_vip']): ?><span class="mini-badge">VIP</span><?php endif; ?>
-                    <?php if ($c['has_4dx']): ?><span class="mini-badge">4DX</span><?php endif; ?>
-                </div>
-                <?php if ($c['next_showtime']): ?>
-                    <span class="cinema-card-next"><?= date('g:i a', strtotime($c['next_showtime'])) ?></span>
-                <?php endif; ?>
+                <span>Browse showtimes</span>
+                <i data-lucide="arrow-up-right"></i>
             </div>
         </a>
         <?php endforeach; ?>
@@ -323,26 +353,24 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- ════════════════════ UPCOMING RELEASES ════════════════════ -->
 <?php if (!empty($upcoming)): ?>
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Showing Soon</h2>
+        <a href="<?= e_link('/movies') ?>" class="section-link">Browse movies</a>
     </div>
     <div class="poster-wall stagger">
-        <?php foreach ($upcoming as $m): ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="wall-card">
-            <?php if ($m['poster_url']): ?>
-                <img src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
+        <?php foreach ($upcoming as $movie): ?>
+        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="wall-card">
+            <?php if (!empty($movie['poster_url'])): ?>
+                <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy">
             <?php else: ?>
-                <div style="width:100%;aspect-ratio:2/3;background:var(--card);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:2rem;">
-                    <?= htmlspecialchars(substr($m['title'], 0, 1)) ?>
-                </div>
+                <div class="wall-card-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
             <?php endif; ?>
             <div class="wall-card-info">
-                <div class="wall-card-title"><?= htmlspecialchars($m['title']) ?></div>
-                <?php if ($m['release_date']): ?>
-                    <div class="wall-card-meta"><?= date('M j', strtotime($m['release_date'])) ?></div>
+                <div class="wall-card-title"><?= htmlspecialchars($movie['title']) ?></div>
+                <?php if (!empty($movie['release_date'])): ?>
+                    <div class="wall-card-meta"><?= date('M j', strtotime($movie['release_date'])) ?></div>
                 <?php endif; ?>
             </div>
         </a>
@@ -351,9 +379,7 @@ include __DIR__ . '/includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- AD PLACEMENT 4: Footer leaderboard -->
-<?php renderAd('leaderboard', 'ad-mt-6 ad-mb-2'); ?>
-
-</div><!-- end page-enter -->
+<?php renderAd('leaderboard', 'ad-mt-6 ad-mb-2 ad-home-slot'); ?>
+</div>
 
 <?php include __DIR__ . '/includes/footer.php'; ?>

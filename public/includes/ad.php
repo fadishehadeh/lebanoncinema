@@ -55,12 +55,13 @@ function renderAdPlaceholder(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?> { margin:0 auto; }
-    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg);     background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
-    #<?= $id ?> .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
-    #<?= $id ?> .ad-label { position:absolute; top:6px; left:10px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.5; font-weight:700; font-family:'Inter',sans-serif; }
-    #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:#fff; opacity:.25; font-size:.7rem; }
+    #<?= $id ?> .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:20px; background:linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,10,0.98)); border:1px solid rgba(255,255,255,0.06); overflow:hidden; transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease); }
+    #<?= $id ?> .ad-inner::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, rgba(229,9,20,0.18), transparent 18%, transparent 82%, rgba(229,9,20,0.12)); pointer-events:none; }
+    #<?= $id ?> .ad-inner:hover { border-color:rgba(229,9,20,0.18); box-shadow:0 20px 40px rgba(0,0,0,0.22); transform:translateY(-2px); }
+    #<?= $id ?> .ad-label { position:absolute; top:8px; left:12px; font-size:.52rem; text-transform:uppercase; letter-spacing:.14em; color:#ff8f98; opacity:.7; font-weight:700; font-family:'Inter',sans-serif; }
+    #<?= $id ?> .ad-skelly { display:flex; flex-direction:column; align-items:center; gap:6px; color:#fff; opacity:.22; font-size:.7rem; }
     #<?= $id ?> .ad-skelly svg { opacity:.4; }
-    #<?= $id ?> .ad-leaderboard { width:728px; max-width:100%; height:90px; padding:4px 24px; margin:0 auto; }
+    #<?= $id ?> .ad-leaderboard { width:728px; max-width:100%; height:90px; padding:0 24px; margin:0 auto; }
     #<?= $id ?> .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; padding:16px; margin:0 auto; display:block; }
     #<?= $id ?> .ad-rectangle { width:100%; max-width:336px; min-height:250px; padding:24px; margin:0 auto; }
     #<?= $id ?> .ad-large-rectangle { width:100%; max-width:336px; min-height:280px; padding:24px; margin:0 auto; }
@@ -104,9 +105,10 @@ function renderAdsenseAd(string $type, array $options): void {
 </div>
 <style>
     #<?= $id ?>-wrap { margin:0 auto; }
-    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:var(--radius-lg); background:#E50914; border:1px solid rgba(229,9,20,0.1); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease); }
-    #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(229,9,20,0.2); box-shadow:0 0 30px rgba(229,9,20,0.08); }
-    #<?= $id ?>-wrap .ad-label { position:absolute; top:4px; left:8px; font-size:.5rem; text-transform:uppercase; letter-spacing:.12em; color:var(--accent); opacity:.45; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
+    #<?= $id ?>-wrap .ad-inner { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:20px; background:linear-gradient(180deg, rgba(15,15,15,0.98), rgba(10,10,10,0.98)); border:1px solid rgba(255,255,255,0.06); overflow:hidden; min-height:50px; transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease); }
+    #<?= $id ?>-wrap .ad-inner::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, rgba(229,9,20,0.18), transparent 18%, transparent 82%, rgba(229,9,20,0.12)); pointer-events:none; }
+    #<?= $id ?>-wrap .ad-inner:hover { border-color:rgba(229,9,20,0.18); box-shadow:0 20px 40px rgba(0,0,0,0.22); transform:translateY(-2px); }
+    #<?= $id ?>-wrap .ad-label { position:absolute; top:8px; left:12px; font-size:.52rem; text-transform:uppercase; letter-spacing:.14em; color:#ff8f98; opacity:.7; font-weight:700; z-index:1; font-family:'Inter',sans-serif; }
     .ad-leaderboard { width:728px; max-width:728px; height:90px; min-height:90px; margin:0 auto; flex:0 0 auto; }
     .ad-mobile-leaderboard { width:100%; max-width:320px; min-height:50px; margin:0 auto; }
     .ad-rectangle { width:100%; max-width:336px; min-height:250px; margin:0 auto; }
