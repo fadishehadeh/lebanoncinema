@@ -167,12 +167,17 @@ if ($genreFilter) {
 $comingSoon = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll()));
 
 $siteUrl = rtrim(SITE_URL, '/');
-$canonical = '/movies' . ($genreFilter ? '?genre=' . urlencode($genreFilter) : '');
-$pageTitle = ($genreFilter ? htmlspecialchars($genreFilter) . ' Movies ' : 'Movies ') . 'Showing Now and Coming Soon in Lebanon - ' . SITE_NAME;
-$pageDescription = 'Browse ' . ($genreFilter ? htmlspecialchars($genreFilter) . ' ' : '') . 'movies showing now and coming soon in Lebanon. Open movie details, compare showtimes, and track upcoming releases across Lebanese cinemas.';
+$canonical = $genreFilter ? '/genres/' . rawurlencode(city_slug($genreFilter)) : '/movies';
+$pageTitle = $genreFilter
+    ? $genreFilter . ' Movies Showing in Lebanon | ' . SITE_NAME
+    : 'Showing Now and Coming Soon Movies in Lebanon | ' . SITE_NAME;
+$pageDescription = $genreFilter
+    ? 'Browse ' . $genreFilter . ' movies showing in Lebanon. Compare cinema showtimes, open movie details, and track upcoming releases in one place.'
+    : 'Browse showing now and coming soon movies in Lebanon. Compare cinema showtimes, open movie details, and track what is playing next across Lebanese cinemas.';
+$pageUpdatedAt = date('Y-m-d H:i:s');
 $breadcrumbs = $genreFilter ? [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
-    ['pos' => 3, 'name' => $genreFilter, 'url' => $canonical],
+    ['pos' => 3, 'name' => $genreFilter, 'url' => '/genres/' . rawurlencode(city_slug($genreFilter))],
 ] : [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
 ];
@@ -183,6 +188,26 @@ $jsonLd = [[
     'name' => $pageTitle,
     'description' => $pageDescription,
     'isPartOf' => ['@id' => $siteUrl . '/#website'],
+], [
+    '@type' => 'FAQPage',
+    'mainEntity' => [
+        [
+            '@type' => 'Question',
+            'name' => 'What movies are showing in Lebanon now?',
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => count($showingNow) . ' movies currently have published showtimes in Lebanon, and ' . count($comingSoon) . ' more are listed as coming soon.',
+            ],
+        ],
+        [
+            '@type' => 'Question',
+            'name' => 'Where can I compare movie showtimes in Lebanon?',
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => 'Use LebanonCinema to compare movie showtimes across VOX, Grand, CinemaCity, Cinemall, Empire, and other Lebanese cinemas.',
+            ],
+        ],
+    ],
 ]];
 
 require_once __DIR__ . '/includes/ad.php';
@@ -191,11 +216,28 @@ include __DIR__ . '/includes/header.php';
 
 <div class="page-enter">
 
+<section class="section" style="padding-top:24px;">
+    <div class="section-header" style="margin-bottom:12px;">
+        <h1 class="section-title" style="font-size:2rem;"><?= htmlspecialchars($genreFilter ? $genreFilter . ' Movies in Lebanon' : 'Movies in Lebanon') ?></h1>
+    </div>
+    <div class="seo-summary" style="padding:0 24px 8px;">
+        <p style="color:var(--text-muted);max-width:920px;line-height:1.7;">
+            <?= $genreFilter
+                ? 'This page tracks ' . htmlspecialchars($genreFilter) . ' movies across Lebanon with both active showtimes and upcoming releases.'
+                : 'This page is the main movie index for Lebanon: showing now, coming soon, and deep links into movie, cinema, city, and showtime pages.' ?>
+            <?= htmlspecialchars(seo_updated_label($pageUpdatedAt)) ?>.
+        </p>
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px;">
+            What you'll find on this page: live movies with published sessions, upcoming releases, genre filtering, and routes into cinema-specific and city-specific showtime pages.
+        </p>
+    </div>
+</section>
+
 <?php if (!empty($allGenres)): ?>
 <div class="genre-strip">
     <a href="<?= e_link('/movies') ?>" class="genre-pill <?= !$genreFilter ? 'active' : '' ?>">All</a>
     <?php foreach ($allGenres as $g): ?>
-        <a href="<?= e_link('/movies?genre=' . urlencode($g)) ?>"
+        <a href="<?= e_link('/genres/' . rawurlencode(city_slug($g))) ?>"
            class="genre-pill <?= ($genreFilter === $g) ? 'active' : '' ?>">
             <?= htmlspecialchars($g) ?>
         </a>
@@ -208,6 +250,17 @@ include __DIR__ . '/includes/header.php';
 <?php renderAd('leaderboard', ['placement' => 'homepage_top']); ?>
 
 <?php renderMovieSection('Coming soon', $comingSoon, true); ?>
+
+<section class="section" style="padding:0 24px 24px;">
+    <div style="background:var(--card);border-radius:var(--radius-lg);padding:24px;border:1px solid var(--border);">
+        <h2 style="font-size:1.1rem;margin-bottom:14px;">Keep Browsing</h2>
+        <p style="color:var(--text-muted);line-height:1.7;">
+            Use <a href="<?= e_link('/cinemas') ?>" style="color:var(--accent);">cinema pages</a> to compare venues,
+            <a href="<?= e_link('/showtimes/beirut') ?>" style="color:var(--accent);">city showtime pages</a> to scan local schedules,
+            and <a href="<?= e_link('/coming-soon') ?>" style="color:var(--accent);">coming soon</a> to catch demand before release week.
+        </p>
+    </div>
+</section>
 
 </div><!-- end page-enter -->
 

@@ -99,6 +99,54 @@ function e_link(string $path = ''): string {
     return htmlspecialchars(_link($path));
 }
 
+function slugifyPathSegment(string $value): string {
+    $value = trim(html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+    if ($ascii !== false) {
+        $value = $ascii;
+    }
+    $value = strtolower($value);
+    $value = preg_replace('/[^a-z0-9]+/', '-', $value);
+    return trim((string) $value, '-');
+}
+
+function city_slug(string $city): string {
+    return slugifyPathSegment($city);
+}
+
+function human_implode(array $items, string $glue = ', ', string $lastGlue = ' and '): string {
+    $items = array_values(array_filter(array_map('trim', $items), static fn($item) => $item !== ''));
+    $count = count($items);
+    if ($count === 0) {
+        return '';
+    }
+    if ($count === 1) {
+        return $items[0];
+    }
+    if ($count === 2) {
+        return $items[0] . $lastGlue . $items[1];
+    }
+
+    return implode($glue, array_slice($items, 0, -1)) . $lastGlue . end($items);
+}
+
+function seo_updated_label(?string $dateTime = null): string {
+    if (!$dateTime) {
+        return 'Updated today';
+    }
+
+    $timestamp = strtotime($dateTime);
+    if ($timestamp === false) {
+        return 'Updated today';
+    }
+
+    if (date('Y-m-d', $timestamp) === date('Y-m-d')) {
+        return 'Updated today';
+    }
+
+    return 'Updated on ' . date('F j, Y', $timestamp);
+}
+
 function getDbConnection(): PDO {
     static $pdo = null;
     if ($pdo) return $pdo;

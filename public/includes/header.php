@@ -20,6 +20,8 @@ $pageImage    = $pageImage ?? '';
 $ogType       = $ogType ?? 'website';
 $jsonLd       = $jsonLd ?? [];
 $breadcrumbs  = $breadcrumbs ?? [];
+$pageUpdatedAt = $pageUpdatedAt ?? null;
+$pageRobots   = $pageRobots ?? 'index, follow, max-snippet:-1, max-image-preview:large';
 $siteUrl      = rtrim(SITE_URL, '/');
 $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonical);
 ?>
@@ -48,6 +50,9 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
     <meta property="og:site_name" content="<?= htmlspecialchars(SITE_NAME) ?>">
     <meta property="og:locale" content="en_US">
+    <?php if ($pageUpdatedAt): ?>
+    <meta property="og:updated_time" content="<?= htmlspecialchars(date(DATE_ATOM, strtotime($pageUpdatedAt))) ?>">
+    <?php endif; ?>
     <?php if ($pageImage): ?>
     <meta property="og:image" content="<?= htmlspecialchars($pageImage) ?>">
     <meta property="og:image:width" content="500">
@@ -63,7 +68,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
     <?php endif; ?>
 
     <!-- Robots -->
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="robots" content="<?= htmlspecialchars($pageRobots) ?>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

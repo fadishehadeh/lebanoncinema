@@ -135,7 +135,7 @@ include __DIR__ . '/includes/header.php';
                             <img src="<?= htmlspecialchars($m['poster_url']) ?>" alt="" style="width:100%;height:100%;object-fit:cover;">
                         <?php endif; ?>
                     </div>
-                    <a href="<?= e_link('/movies/' . rawurlencode($m['movie_slug'])) ?>" class="name" style="font-size:0.9rem;">
+                    <a href="<?= e_link('/movies/' . rawurlencode($m['movie_slug']) . '/showtimes-in-' . rawurlencode($citySlug)) ?>" class="name" style="font-size:0.9rem;">
                         <?= htmlspecialchars($m['movie_title']) ?>
                     </a>
                     <?php if ($m['rating']): ?>

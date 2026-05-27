@@ -39,7 +39,7 @@ if (!empty($movie['genres_json'])) {
 $stmt = $db->prepare("
     SELECT
         s.show_date,
-        c.id AS cinema_id, c.name AS cinema_name, c.slug AS cinema_slug,
+        c.id AS cinema_id, c.name AS cinema_name, c.slug AS cinema_slug, c.city AS cinema_city,
         ch.name AS chain_name, ch.color_hex,
         GROUP_CONCAT(s.show_time ORDER BY s.show_time SEPARATOR ',') AS times,
         s.format, s.booking_url
@@ -157,6 +157,9 @@ $pageTitle = htmlspecialchars($movie['title']) . ' Showtimes in Lebanon — ' . 
 $pageDescription = htmlspecialchars($movie['title']) . ' showtimes in Lebanon — find where to watch at VOX, Grand, CinemaCity and more. ' . ($movie['synopsis'] ? htmlspecialchars(substr($movie['synopsis'], 0, 120)) : 'Watch trailer, check cinema schedules, and book tickets online.');
 $pageImage = $movie['poster_url'] ?? '';
 $canonical = '/movies/' . rawurlencode($slug);
+$updatedStmt = $db->prepare("SELECT GREATEST(COALESCE(MAX(s.created_at), '1970-01-01'), COALESCE(MAX(m.updated_at), '1970-01-01')) FROM movies m LEFT JOIN showtimes s ON s.movie_id = m.id AND s.show_date >= CURDATE() WHERE m.id = ?");
+$updatedStmt->execute([$movie['id']]);
+$pageUpdatedAt = $updatedStmt->fetchColumn() ?: null;
 $breadcrumbs = [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
     ['pos' => 3, 'name' => $movie['title'], 'url' => $canonical],
@@ -186,6 +189,7 @@ if (isset($byDate[date('Y-m-d')])) {
 
 // Build cinema names list for FAQ
 $cinemaNamesList = !empty($showtimeRows) ? implode(', ', array_unique(array_map(fn($s) => $s['cinema_name'], $showtimeRows))) : 'select cinemas';
+$cityNamesList = !empty($showtimeRows) ? array_values(array_unique(array_map(fn($s) => $s['cinema_city'], $showtimeRows))) : [];
 
 $jsonLd = [
     [
@@ -308,6 +312,16 @@ include __DIR__ . '/includes/header.php';
         <?php if ($movie['synopsis']): ?>
             <p class="detail-synopsis"><?= htmlspecialchars($movie['synopsis']) ?></p>
         <?php endif; ?>
+        <div class="seo-summary" style="color:var(--text-muted);font-size:0.95rem;line-height:1.7;max-width:720px;margin-top:12px;">
+            <?php if (!empty($showtimeRows)): ?>
+                <?= htmlspecialchars($movie['title']) ?> is showing in Lebanon at <?= htmlspecialchars($cinemaNamesList) ?><?= !empty($cityNamesList) ? ' across ' . htmlspecialchars(human_implode($cityNamesList)) : '' ?>.
+            <?php elseif ($isComingSoon): ?>
+                <?= htmlspecialchars($movie['title']) ?> is currently listed as coming soon in Lebanon.
+            <?php else: ?>
+                <?= htmlspecialchars($movie['title']) ?> does not currently have published sessions in the next seven days.
+            <?php endif; ?>
+            <?= htmlspecialchars(seo_updated_label($pageUpdatedAt)) ?>.
+        </div>
 
         <?php if (!empty($movie['cast_json'])): $cast = json_decode($movie['cast_json'], true); ?>
         <?php if (!empty($cast)): ?>
@@ -449,6 +463,17 @@ include __DIR__ . '/includes/header.php';
     <?php renderAd('skyscraper', ['placement' => 'movie_sidebar_sticky']); ?>
  </aside>
 </div>
+
+<?php if (!empty($cityNamesList)): ?>
+<section class="section" style="padding:0 24px 24px;">
+    <h2 class="section-title" style="margin-bottom:16px;">Showtimes by City</h2>
+    <div class="genre-strip">
+        <?php foreach ($cityNamesList as $cityName): ?>
+        <a href="<?= e_link('/movies/' . rawurlencode($slug) . '/showtimes-in-' . rawurlencode(city_slug($cityName))) ?>" class="genre-pill"><?= htmlspecialchars($movie['title']) ?> in <?= htmlspecialchars($cityName) ?></a>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- RELATED MOVIES -->
 <?php if (!empty($related)): ?>

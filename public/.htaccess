@@ -26,6 +26,9 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^genres/([a-z0-9-]+)/?$              genre.php?slug=$1 [L,QSA]
 RewriteRule ^showtimes/([a-z0-9-]+)/?$            showtimes.php?slug=$1 [L,QSA]
 RewriteRule ^cities/([a-z0-9-]+)/?$               city.php?slug=$1 [L,QSA]
+RewriteRule ^([a-z0-9-]+)/movies-showing-today/?$ city_movies_today.php?slug=$1 [L,QSA]
+RewriteRule ^cinemas/([a-z0-9-]+)/movies-showing-today/?$ cinema_movies_today.php?slug=$1 [L,QSA]
+RewriteRule ^movies/([a-z0-9-]+)/showtimes-in-([a-z0-9-]+)/?$ movie_city_showtimes.php?movie_slug=$1&city_slug=$2 [L,QSA]
 
 # SEO REDIRECTS
 RewriteRule ^movies-today-lebanon/?$               / [R=301,L]

@@ -152,11 +152,11 @@ include __DIR__ . '/includes/header.php';
 <section class="section">
     <div class="section-header">
         <h2 class="section-title">Movies Playing Today in <?= htmlspecialchars($cityName) ?></h2>
-        <a href="<?= e_link('/movies') ?>" class="section-link">All movies</a>
+        <a href="<?= e_link('/' . rawurlencode($citySlug) . '/movies-showing-today') ?>" class="section-link">Movies showing today</a>
     </div>
     <div class="movie-grid stagger">
         <?php foreach ($movies as $m): ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card">
+        <a href="<?= e_link('/movies/' . rawurlencode($m['slug']) . '/showtimes-in-' . rawurlencode($citySlug)) ?>" class="poster-card">
             <?php if ($m['poster_url']): ?>
                 <img class="poster-card-img" src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
             <?php else: ?>

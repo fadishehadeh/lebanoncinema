@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://www.lebanoncinema.com/sitemap.xml
+Sitemap: https://lebanoncinema.com/sitemap.xml
 
 # Disallow admin or private areas
 Disallow: /includes/

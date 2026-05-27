@@ -1,4 +1,34 @@
+<?php
+$footerCities = [];
+$footerChains = [];
+try {
+    $footerDb = getDbConnection();
+    $cityStmt = $footerDb->query("
+        SELECT c.city, COUNT(DISTINCT s.movie_id) AS movies_live
+        FROM cinemas c
+        LEFT JOIN showtimes s ON s.cinema_id = c.id AND s.show_date >= CURDATE()
+        WHERE c.is_active = 1 AND c.city IS NOT NULL AND c.city <> ''
+        GROUP BY c.city
+        ORDER BY movies_live DESC, c.city ASC
+        LIMIT 6
+    ");
+    $footerCities = $cityStmt ? ($cityStmt->fetchAll() ?: []) : [];
 
+    $chainStmt = $footerDb->query("
+        SELECT ch.name, ch.slug, COUNT(DISTINCT c.id) AS cinema_count
+        FROM chains ch
+        JOIN cinemas c ON c.chain_id = ch.id
+        WHERE c.is_active = 1
+        GROUP BY ch.id
+        ORDER BY cinema_count DESC, ch.name ASC
+        LIMIT 6
+    ");
+    $footerChains = $chainStmt ? ($chainStmt->fetchAll() ?: []) : [];
+} catch (\Throwable $e) {
+    $footerCities = [];
+    $footerChains = [];
+}
+?>
 <!-- Bottom Navigation -->
 <nav class="bottom-nav">
     <a class="bottom-nav-item" href="<?= _link('/') ?>">
@@ -35,21 +65,39 @@
         </div>
         <div>
             <h4>Cinema Chains</h4>
-            <a href="<?= _link('/cinemas') ?>">VOX Cinemas</a>
-            <a href="<?= _link('/cinemas') ?>">Grand Cinemas</a>
-            <a href="<?= _link('/cinemas') ?>">Empire Cinemas</a>
-            <a href="<?= _link('/cinemas') ?>">CinemaCity</a>
-            <a href="<?= _link('/cinemas') ?>">Cinemall</a>
-            <a href="<?= _link('/cinemas') ?>">Stargate</a>
+            <?php if (!empty($footerChains)): ?>
+                <?php foreach ($footerChains as $chain): ?>
+                <a href="<?= _link('/cinemas') ?>"><?= htmlspecialchars($chain['name']) ?></a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <a href="<?= _link('/cinemas') ?>">VOX Cinemas</a>
+                <a href="<?= _link('/cinemas') ?>">Grand Cinemas</a>
+                <a href="<?= _link('/cinemas') ?>">Empire Cinemas</a>
+                <a href="<?= _link('/cinemas') ?>">CinemaCity</a>
+                <a href="<?= _link('/cinemas') ?>">Cinemall</a>
+                <a href="<?= _link('/cinemas') ?>">Stargate</a>
+            <?php endif; ?>
         </div>
         <div>
             <h4>Genres</h4>
-            <a href="<?= _link('/movies?genre=Action') ?>">Action</a>
-            <a href="<?= _link('/movies?genre=Comedy') ?>">Comedy</a>
-            <a href="<?= _link('/movies?genre=Drama') ?>">Drama</a>
-            <a href="<?= _link('/movies?genre=Horror') ?>">Horror</a>
-            <a href="<?= _link('/movies?genre=Family') ?>">Family</a>
-            <a href="<?= _link('/movies?genre=Animation') ?>">Animation</a>
+            <a href="<?= _link('/genres/action') ?>">Action</a>
+            <a href="<?= _link('/genres/comedy') ?>">Comedy</a>
+            <a href="<?= _link('/genres/drama') ?>">Drama</a>
+            <a href="<?= _link('/genres/horror') ?>">Horror</a>
+            <a href="<?= _link('/genres/family') ?>">Family</a>
+            <a href="<?= _link('/genres/animation') ?>">Animation</a>
+        </div>
+        <div>
+            <h4>Popular Cities</h4>
+            <?php if (!empty($footerCities)): ?>
+                <?php foreach ($footerCities as $city): ?>
+                <a href="<?= _link('/cities/' . rawurlencode(city_slug($city['city']))) ?>"><?= htmlspecialchars($city['city']) ?> Movies</a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <a href="<?= _link('/showtimes/beirut') ?>">Beirut Showtimes</a>
+                <a href="<?= _link('/showtimes/dbayeh') ?>">Dbayeh Showtimes</a>
+                <a href="<?= _link('/showtimes/jounieh') ?>">Jounieh Showtimes</a>
+            <?php endif; ?>
         </div>
     </div>
     <div class="footer-bottom">

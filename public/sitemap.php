@@ -10,6 +10,12 @@ require_once __DIR__ . '/../config.php';
 
 $db = getDbConnection();
 $today = date('Y-m-d');
+$siteUpdatedAt = $db->query("
+    SELECT GREATEST(
+        COALESCE((SELECT MAX(updated_at) FROM movies), '1970-01-01'),
+        COALESCE((SELECT MAX(created_at) FROM showtimes), '1970-01-01')
+    ) AS lastmod
+")->fetchColumn() ?: $today;
 
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
@@ -19,7 +25,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Homepage -->
     <url>
         <loc><?= url('/') ?></loc>
-        <lastmod><?= $today ?></lastmod>
+        <lastmod><?= date('Y-m-d', strtotime((string) $siteUpdatedAt)) ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
@@ -27,7 +33,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Movies -->
     <url>
         <loc><?= url('/movies') ?></loc>
-        <lastmod><?= $today ?></lastmod>
+        <lastmod><?= date('Y-m-d', strtotime((string) $siteUpdatedAt)) ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
     </url>
@@ -35,7 +41,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Cinemas -->
     <url>
         <loc><?= url('/cinemas') ?></loc>
-        <lastmod><?= $today ?></lastmod>
+        <lastmod><?= date('Y-m-d', strtotime((string) $siteUpdatedAt)) ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -51,7 +57,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
     <!-- Coming Soon -->
     <url>
         <loc><?= url('/coming-soon') ?></loc>
-        <lastmod><?= $today ?></lastmod>
+        <lastmod><?= date('Y-m-d', strtotime((string) $siteUpdatedAt)) ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
@@ -67,8 +73,15 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <?php
 // Movies
 $stmt = $db->prepare("
-    SELECT m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.updated_at
+    SELECT
+        m.slug,
+        COALESCE(m.poster_path, m.poster_url) AS poster_url,
+        GREATEST(
+            COALESCE(m.updated_at, '1970-01-01'),
+            COALESCE(MAX(s.created_at), '1970-01-01')
+        ) AS updated_at
     FROM movies m
+    LEFT JOIN showtimes s ON s.movie_id = m.id AND s.show_date >= CURDATE()
     WHERE COALESCE(m.status, '') IN ('now_showing', 'showing_now', 'coming_soon')
        OR EXISTS (
             SELECT 1
@@ -76,6 +89,7 @@ $stmt = $db->prepare("
             WHERE s.movie_id = m.id
               AND s.show_date >= CURDATE()
        )
+    GROUP BY m.id
     ORDER BY m.title ASC
 ");
 $stmt->execute();
@@ -99,7 +113,14 @@ foreach ($movies as $m):
 
 <?php
 // Cinemas
-$stmt = $db->prepare("SELECT slug, name FROM cinemas WHERE is_active = 1 ORDER BY name ASC");
+$stmt = $db->prepare("
+    SELECT c.slug, c.name, MAX(s.created_at) AS updated_at
+    FROM cinemas c
+    LEFT JOIN showtimes s ON s.cinema_id = c.id AND s.show_date >= CURDATE()
+    WHERE c.is_active = 1
+    GROUP BY c.id
+    ORDER BY c.name ASC
+");
 $stmt->execute();
 $cinemas = $stmt->fetchAll();
 
@@ -107,8 +128,15 @@ foreach ($cinemas as $c):
 ?>
     <url>
         <loc><?= url() ?>/cinemas/<?= rawurlencode($c['slug']) ?></loc>
+        <lastmod><?= !empty($c['updated_at']) ? date('Y-m-d', strtotime($c['updated_at'])) : $today ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
+    </url>
+    <url>
+        <loc><?= url() ?>/cinemas/<?= rawurlencode($c['slug']) ?>/movies-showing-today</loc>
+        <lastmod><?= !empty($c['updated_at']) ? date('Y-m-d', strtotime($c['updated_at'])) : $today ?></lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
     </url>
 <?php endforeach; ?>
 
@@ -140,29 +168,60 @@ sort($allGenres);
 foreach ($allGenres as $g):
 ?>
     <url>
-        <loc><?= url() ?>/movies?genre=<?= urlencode($g) ?></loc>
+        <loc><?= url() ?>/genres/<?= rawurlencode(city_slug($g)) ?></loc>
+        <lastmod><?= date('Y-m-d', strtotime((string) $siteUpdatedAt)) ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
     </url>
 <?php endforeach; ?>
 
 <?php
-// City pages (showtimes + city landing)
-$stmt = $db->prepare("SELECT DISTINCT city FROM cinemas WHERE is_active = 1 AND city IS NOT NULL ORDER BY city ASC");
+// City pages
+$stmt = $db->prepare("
+    SELECT c.city, MAX(s.created_at) AS updated_at
+    FROM cinemas c
+    LEFT JOIN showtimes s ON s.cinema_id = c.id AND s.show_date >= CURDATE()
+    WHERE c.is_active = 1 AND c.city IS NOT NULL
+    GROUP BY c.city
+    ORDER BY c.city ASC
+");
 $stmt->execute();
 $cities = $stmt->fetchAll();
 foreach ($cities as $ct):
-    $citySlug = strtolower(str_replace(' ', '-', $ct['city']));
+    $citySlug = city_slug($ct['city']);
+    $cityLastmod = !empty($ct['updated_at']) ? date('Y-m-d', strtotime($ct['updated_at'])) : $today;
 ?>
     <url>
         <loc><?= url() ?>/showtimes/<?= rawurlencode($citySlug) ?></loc>
+        <lastmod><?= $cityLastmod ?></lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
         <loc><?= url() ?>/cities/<?= rawurlencode($citySlug) ?></loc>
+        <lastmod><?= $cityLastmod ?></lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
     </url>
+    <url>
+        <loc><?= url() ?>/<?= rawurlencode($citySlug) ?>/movies-showing-today</loc>
+        <lastmod><?= $cityLastmod ?></lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+<?php endforeach; ?>
+
+<?php foreach ($movies as $m): ?>
+    <?php foreach ($cities as $ct):
+        $citySlug = city_slug($ct['city']);
+        $cityLastmod = !empty($ct['updated_at']) ? date('Y-m-d', strtotime($ct['updated_at'])) : $today;
+    ?>
+    <url>
+        <loc><?= url() ?>/movies/<?= rawurlencode($m['slug']) ?>/showtimes-in-<?= rawurlencode($citySlug) ?></loc>
+        <lastmod><?= $cityLastmod ?></lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.5</priority>
+    </url>
+    <?php endforeach; ?>
 <?php endforeach; ?>
 </urlset>

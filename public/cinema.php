@@ -173,7 +173,10 @@ include __DIR__ . '/includes/header.php';
 
 <?php if (!empty($byDate)): ?>
 <div class="showtimes-wrap">
-    <h2 class="section-title" style="margin-bottom:20px;">What's Playing</h2>
+    <div class="section-header" style="padding:0;margin-bottom:20px;">
+        <h2 class="section-title">What's Playing</h2>
+        <a href="<?= e_link('/cinemas/' . rawurlencode($slug) . '/movies-showing-today') ?>" class="section-link">Movies showing today</a>
+    </div>
 
     <div class="date-strip">
         <?php foreach ($dates as $d): ?>

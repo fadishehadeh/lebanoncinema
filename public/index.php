@@ -84,8 +84,36 @@ $stmt = $db->prepare("
 $stmt->execute();
 $comingSoon = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll() ?? []));
 
-$pageTitle = 'Showing Now and Coming Soon Movies in Lebanon - ' . SITE_NAME;
+$pageTitle = 'Showing Now and Coming Soon Movies in Lebanon | ' . SITE_NAME;
 $pageDescription = 'Browse showing now and coming soon movies across Lebanon. Compare cinema showtimes, open movie details, and track what is playing next at VOX, Grand, CinemaCity, Cinemall and more.';
+$pageUpdatedAt = date('Y-m-d H:i:s');
+$jsonLd = [[
+    '@type' => 'CollectionPage',
+    '@id' => url('/') . '#homepage',
+    'name' => $pageTitle,
+    'description' => $pageDescription,
+    'isPartOf' => ['@id' => rtrim(SITE_URL, '/') . '/#website'],
+], [
+    '@type' => 'FAQPage',
+    'mainEntity' => [
+        [
+            '@type' => 'Question',
+            'name' => 'Where can I compare cinema showtimes in Lebanon?',
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => 'LebanonCinema compares movie showtimes across Lebanese cinemas including VOX, Grand, CinemaCity, Cinemall, and Empire.',
+            ],
+        ],
+        [
+            '@type' => 'Question',
+            'name' => 'What movies are showing in Lebanon now?',
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => count($showingNow) . ' movies currently have live upcoming showtimes in Lebanon, with ' . count($comingSoon) . ' more listed as coming soon.',
+            ],
+        ],
+    ],
+]];
 $showSkeleton = true;
 $breadcrumbs = [];
 include __DIR__ . '/includes/header.php';
@@ -252,6 +280,17 @@ require_once __DIR__ . '/includes/ad.php';
             <button class="chip" data-filter="horror">Horror</button>
             <button class="chip" data-filter="family">Family</button>
         </div>
+    </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+    <div class="seo-summary" style="padding:0 24px 12px;">
+        <p style="color:var(--text-muted);max-width:920px;line-height:1.7;">
+            LebanonCinema tracks showing now and coming soon movies across Lebanon with direct routes into movie pages, cinema pages, and city-specific showtime pages. <?= htmlspecialchars(seo_updated_label($pageUpdatedAt)) ?>.
+        </p>
+        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px;">
+            What you'll find on this page: featured movies, live cinema cards, current releases, coming soon titles, and search paths into local showtimes.
+        </p>
     </div>
 </section>
 
