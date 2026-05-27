@@ -1,6 +1,5 @@
 Options -Indexes
 RewriteEngine On
-RewriteBase /lebanoncinema/public
 
 # SEO & PERFORMANCE HEADERS
 <IfModule mod_headers.c>

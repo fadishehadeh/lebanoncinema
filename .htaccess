@@ -1,0 +1,19 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Preserve ACME challenges and direct requests already under /public.
+RewriteRule ^\.well-known/ - [L]
+RewriteRule ^public/ - [L]
+
+# Send all app traffic through the public front controller.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+<FilesMatch "^(config\.php|schema\.sql|README\.md|SETUP_.*|.*\.sql|.*\.zip)$">
+    Require all denied
+</FilesMatch>
