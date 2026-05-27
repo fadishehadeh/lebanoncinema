@@ -66,7 +66,18 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 
 <?php
 // Movies
-$stmt = $db->prepare("SELECT slug, poster_url, updated_at FROM movies WHERE status IN ('now_showing','coming_soon') ORDER BY title ASC");
+$stmt = $db->prepare("
+    SELECT m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.updated_at
+    FROM movies m
+    WHERE COALESCE(m.status, '') IN ('now_showing', 'showing_now', 'coming_soon')
+       OR EXISTS (
+            SELECT 1
+            FROM showtimes s
+            WHERE s.movie_id = m.id
+              AND s.show_date >= CURDATE()
+       )
+    ORDER BY m.title ASC
+");
 $stmt->execute();
 $movies = $stmt->fetchAll();
 
@@ -103,7 +114,21 @@ foreach ($cinemas as $c):
 
 <?php
 // Genre pages
-$stmt = $db->prepare("SELECT DISTINCT genres FROM movies WHERE status = 'now_showing' AND genres IS NOT NULL");
+$stmt = $db->prepare("
+    SELECT DISTINCT m.genres
+    FROM movies m
+    WHERE m.genres IS NOT NULL
+      AND m.genres <> ''
+      AND (
+            COALESCE(m.status, '') IN ('now_showing', 'showing_now')
+            OR EXISTS (
+                SELECT 1
+                FROM showtimes s
+                WHERE s.movie_id = m.id
+                  AND s.show_date >= CURDATE()
+            )
+      )
+");
 $stmt->execute();
 $allGenres = [];
 foreach ($stmt->fetchAll() as $row) {
