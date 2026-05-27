@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node cinema-scraper.js",
     "scrape": "node cinema-scraper.js",
+    "scrape:catalog": "node scrape_catalog.js",
+    "audit:showtimes": "node audit_showtimes.js",
     "scrape:puppeteer": "node cinema-scraper.js",
     "scrape:cheerio": "node cinema-scraper-cheerio.js",
     "server": "node server.js",

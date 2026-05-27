@@ -27,49 +27,29 @@ $stmt = $db->prepare("
            GROUP_CONCAT(DISTINCT s.show_time ORDER BY s.show_time SEPARATOR ',') AS hero_times
     FROM movies m
     JOIN showtimes s ON s.movie_id = m.id AND s.show_date = CURDATE()
-    WHERE m.is_showing = 1
     GROUP BY m.id
     ORDER BY showtime_count DESC
     LIMIT 5
 ");
 $stmt->execute();
-$heroMovies = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
+$heroMovies = array_slice(mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll() ?? [])), 0, 5);
 
 $stmt = $db->prepare("
     SELECT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min,
            COUNT(s.id) AS showtime_count,
-           MIN(s.show_time) AS first_showtime,
+           MIN(CASE WHEN s.show_date = CURDATE() THEN s.show_time ELSE NULL END) AS first_showtime,
            MAX(CASE WHEN c.has_imax = 1 THEN 1 ELSE 0 END) AS has_imax,
            MAX(CASE WHEN c.has_vip = 1 THEN 1 ELSE 0 END) AS has_vip
     FROM movies m
     JOIN showtimes s ON s.movie_id = m.id
     JOIN cinemas c ON s.cinema_id = c.id
-    WHERE s.show_date = CURDATE()
+    WHERE s.show_date >= CURDATE()
     GROUP BY m.id
     ORDER BY showtime_count DESC
     LIMIT 12
 ");
 $stmt->execute();
-$trending = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
-
-$stmt = $db->prepare("
-    SELECT DISTINCT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min,
-           MIN(s.show_time) AS next_showtime,
-           c.name AS cinema_name, c.slug AS cinema_slug,
-           c.has_imax, c.has_vip,
-           ch.color_hex, s.format, s.booking_url
-    FROM showtimes s
-    JOIN movies m ON s.movie_id = m.id
-    JOIN cinemas c ON s.cinema_id = c.id
-    JOIN chains ch ON c.chain_id = ch.id
-    WHERE s.show_date = CURDATE()
-      AND s.show_time BETWEEN CURTIME() AND ADDTIME(CURTIME(), '02:30:00')
-    GROUP BY m.id, c.id, s.format
-    ORDER BY next_showtime ASC
-    LIMIT 12
-");
-$stmt->execute();
-$startingSoon = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
+$showingNow = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll() ?? []));
 
 $stmt = $db->prepare("
     SELECT c.id, c.name, c.slug, c.city, c.area,
@@ -89,16 +69,23 @@ $stmt->execute();
 $cinemas = $stmt->fetchAll() ?? [];
 
 $stmt = $db->prepare("
-    SELECT * FROM movies
-    WHERE status = 'coming_soon'
+    SELECT m.*, COALESCE(m.poster_path, m.poster_url) AS poster_url
+    FROM movies m
+    WHERE m.status = 'coming_soon'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM showtimes s
+          WHERE s.movie_id = m.id
+            AND s.show_date >= CURDATE()
+      )
     ORDER BY release_date DESC
     LIMIT 12
 ");
 $stmt->execute();
-$upcoming = array_map('mapMovieRow', $stmt->fetchAll() ?? []);
+$comingSoon = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll() ?? []));
 
-$pageTitle = 'Movies Showing Today in Lebanon - ' . SITE_NAME;
-$pageDescription = 'Find movies playing today at cinemas across Lebanon. Browse showtimes for VOX, Grand, Empire, CinemaCity and more. Watch trailers, check schedules, and book cinema tickets online.';
+$pageTitle = 'Showing Now and Coming Soon Movies in Lebanon - ' . SITE_NAME;
+$pageDescription = 'Browse showing now and coming soon movies across Lebanon. Compare cinema showtimes, open movie details, and track what is playing next at VOX, Grand, CinemaCity, Cinemall and more.';
 $showSkeleton = true;
 $breadcrumbs = [];
 include __DIR__ . '/includes/header.php';
@@ -270,14 +257,14 @@ require_once __DIR__ . '/includes/ad.php';
 
 <?php renderAd('leaderboard', ['placement' => 'homepage_top']); ?>
 
-<?php if (!empty($trending)): ?>
+<?php if (!empty($showingNow)): ?>
 <section class="section">
     <div class="section-header">
-        <h2 class="section-title">Trending Tonight</h2>
+        <h2 class="section-title">Showing now</h2>
         <a href="<?= e_link('/movies') ?>" class="section-link">See all</a>
     </div>
     <div class="carousel-grid stagger">
-        <?php foreach ($trending as $index => $movie):
+        <?php foreach ($showingNow as $index => $movie):
             $urgency = !empty($movie['first_showtime']) ? urgencyLabel(getMinutesUntil($movie['first_showtime'])) : null;
         ?>
         <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="poster-card"
@@ -290,17 +277,24 @@ require_once __DIR__ . '/includes/ad.php';
             <?php else: ?>
                 <div class="poster-card-img poster-card-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
             <?php endif; ?>
+            <div class="default-overlay">
+                <?php if ($urgency): ?>
+                    <span class="poster-card-badge <?= $urgency['class'] ?>" style="position:relative;top:auto;right:auto;display:inline-block;width:fit-content;margin-bottom:6px;"><?= htmlspecialchars($urgency['label']) ?></span>
+                <?php endif; ?>
+                <div class="poster-card-title"><?= htmlspecialchars($movie['title']) ?></div>
+                <div class="poster-card-meta">
+                    <?php if (!empty($movie['genres'])): ?><span><?= htmlspecialchars(substr($movie['genres'], 0, 30)) ?></span><?php endif; ?>
+                </div>
+            </div>
             <div class="poster-card-overlay">
                 <div class="poster-card-title"><?= htmlspecialchars($movie['title']) ?></div>
                 <div class="poster-card-meta">
-                    <?php if (!empty($movie['genres'])): ?><?= htmlspecialchars(substr($movie['genres'], 0, 30)) ?><?php endif; ?>
-                    <?php if (!empty($movie['duration_min'])): ?><?= !empty($movie['genres']) ? ' • ' : '' ?><?= (int) $movie['duration_min'] ?> min<?php endif; ?>
+                    <?php if (!empty($movie['duration_min'])): ?><?= (int) $movie['duration_min'] ?> min<?php endif; ?>
+                    <?php if (!empty($movie['showtime_count'])): ?><?= !empty($movie['duration_min']) ? ' · ' : '' ?><?= (int) $movie['showtime_count'] ?> upcoming showtimes<?php endif; ?>
                 </div>
             </div>
-            <?php if ($urgency): ?>
-                <span class="poster-card-badge <?= $urgency['class'] ?>"><?= htmlspecialchars($urgency['label']) ?></span>
-            <?php elseif (!empty($movie['rating'])): ?>
-                <span class="poster-card-badge accent">Rated <?= htmlspecialchars($movie['rating']) ?></span>
+            <?php if (!empty($movie['rating'])): ?>
+                <span class="poster-card-badge accent"><?= htmlspecialchars($movie['rating']) ?></span>
             <?php endif; ?>
         </a>
         <?php if ($index === 5): ?>
@@ -360,21 +354,41 @@ require_once __DIR__ . '/includes/ad.php';
 </section>
 <?php endif; ?>
 
-<?php if (!empty($upcoming)): ?>
+<?php if (!empty($comingSoon)): ?>
 <section class="section">
     <div class="section-header">
-        <h2 class="section-title">Showing Soon</h2>
+        <h2 class="section-title">Coming soon</h2>
         <a href="<?= e_link('/movies') ?>" class="section-link">Browse movies</a>
     </div>
-    <div class="poster-wall stagger">
-        <?php foreach ($upcoming as $index => $movie): ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="wall-card">
+    <div class="carousel-grid stagger">
+        <?php foreach ($comingSoon as $index => $movie): ?>
+        <a href="<?= e_link('/movies/' . rawurlencode($movie['slug'])) ?>" class="poster-card">
             <?php if (!empty($movie['poster_url'])): ?>
-                <img src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy">
+                <img class="poster-card-img" src="<?= htmlspecialchars($movie['poster_url']) ?>" alt="<?= htmlspecialchars($movie['title']) ?>" loading="lazy">
             <?php else: ?>
-                <div class="wall-card-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
+                <div class="poster-card-img poster-card-fallback"><?= htmlspecialchars(substr($movie['title'], 0, 1)) ?></div>
             <?php endif; ?>
-            <div class="wall-card-info">
+
+            <div class="default-overlay">
+                <div class="poster-card-title"><?= htmlspecialchars($movie['title']) ?></div>
+                <div class="poster-card-meta">
+                    <?php if (!empty($movie['release_date'])): ?><span><?= date('M j, Y', strtotime($movie['release_date'])) ?></span><?php endif; ?>
+                </div>
+            </div>
+
+            <div class="poster-card-overlay">
+                <div class="poster-card-title"><?= htmlspecialchars($movie['title']) ?></div>
+                <div class="poster-card-meta">
+                    <?php if (!empty($movie['duration_min'])): ?><span><?= (int) $movie['duration_min'] ?> min</span><?php endif; ?>
+                    <?php if (!empty($movie['genres'])): ?><span><?= !empty($movie['duration_min']) ? ' · ' : '' ?><?= htmlspecialchars(substr($movie['genres'], 0, 30)) ?></span><?php endif; ?>
+                </div>
+            </div>
+
+            <?php if (!empty($movie['rating'])): ?>
+                <span class="poster-card-badge accent"><?= htmlspecialchars($movie['rating']) ?></span>
+            <?php endif; ?>
+
+            <div class="wall-card-info" style="display:none;">
                 <div class="wall-card-title"><?= htmlspecialchars($movie['title']) ?></div>
                 <?php if (!empty($movie['release_date'])): ?>
                     <div class="wall-card-meta"><?= date('M j', strtotime($movie['release_date'])) ?></div>

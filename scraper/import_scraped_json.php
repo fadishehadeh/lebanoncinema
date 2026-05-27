@@ -4,9 +4,11 @@
  *
  * Usage: php scraper/import_scraped_json.php [path/to/movies.json]
  *
- * Processes scraped showtime data from VOX, Cinema City, Grand Cinema.
- * Normalizes movie titles, matches to local DB, maps locations to cinema slugs,
- * extracts formats (VIP, IMAX, 4DX, etc.), and inserts showtimes.
+ * Reconciles scraped showtimes for the imported movie/cinema/date scope:
+ * - normalizes titles and formats
+ * - maps source locations to local cinema slugs
+ * - deletes stale rows in the affected scope
+ * - inserts current rows using the showtime unique key
  */
 
 require_once __DIR__ . '/../config.php';
@@ -26,29 +28,23 @@ if (empty($movies)) {
 
 echo "=== Importing " . count($movies) . " showtime records ===\n\n";
 
-// ─── Load local movies for matching ───
 $localMovies = [];
 $stmt = $db->query("SELECT id, title, slug FROM movies");
-foreach ($stmt as $r) {
-    $localMovies[] = $r;
+foreach ($stmt as $row) {
+    $localMovies[] = $row;
 }
 
-// ─── Cinema location → slug mapping ───
 $locationMap = [
-    // Cinema City
     'beirut souks cinemacity' => 'cinemacity-souks',
-    // Grand Cinema
     'abc achrafieh' => 'grand-abc-achrafieh',
     'grand abc achrafieh' => 'grand-abc-achrafieh',
     'grand abc dbayeh' => 'grand-abc-dbayeh',
     'grand abc verdun' => 'grand-abc-verdun',
     'las salinas' => 'grand-las-salinas',
     'the spot saida' => 'grand-the-spot-saida',
-    // VOX
     'city centre beirut' => 'vox-city-centre-beirut',
 ];
 
-// ─── Format mapping from title suffix ───
 $formatSuffixes = [
     '(vip)' => 'VIP',
     '(studio.15)' => 'STUDIO.15',
@@ -59,7 +55,6 @@ $formatSuffixes = [
     '(standard)' => 'Standard',
 ];
 
-// ─── Location format suffix mapping ───
 $locationFormats = [
     '- std' => 'Standard',
     '- vip' => 'VIP',
@@ -67,14 +62,14 @@ $locationFormats = [
     '- 4dx' => '4DX',
     '- gold' => 'GOLD',
     '- standard' => 'Standard',
+    '- offline' => 'Standard',
 ];
 
-// ─── Direct movie title overrides (scraped → our DB title) ───
 $titleOverrides = [
     'mortal kombat ii' => 'Mortal Kombat 2',
-    'mortal kombat 2' => 'Mortal Kombat 2',
-    'asad' => 'ASAD أسد',
-    'asad أسد' => 'ASAD أسد',
+    'mortal kombat 2' => 'Mortal Kombat II',
+    'asad' => 'Asad',
+    'asad Ø£Ø³Ø¯' => 'Asad',
     'billie eilish   hit me hard and soft the tour' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
     'billie eilish - hit me hard and soft: the tour' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
     'billie eilish: hit me hard and soft (3d)' => 'Billie Eilish - Hit Me Hard and Soft: The Tour',
@@ -99,16 +94,10 @@ $titleOverrides = [
     '7 dogs' => '7 Dogs',
     'hokum' => 'Hokum',
     'liste de mariage' => 'Liste De Mariage',
-    'el kalam ala eh (awel leila)' => 'Liste De Mariage',
-    'el kalam ala eh (awel leila),' => 'Liste De Mariage',
-    'el kalam ala eh awel leila' => 'Liste De Mariage',
-    'asad' => 'Asad',
-    'asad أسد' => 'Asad',
     'top gun 40th anniversary' => 'TOP GUN 40TH ANNIVERSARY',
     'animal farm' => 'Animal Farm',
 ];
 
-// ─── Statistics ───
 $stats = [
     'matched' => 0,
     'auto_created' => 0,
@@ -116,98 +105,86 @@ $stats = [
     'unmatched_locations' => [],
     'inserted' => 0,
     'duplicates' => 0,
+    'deleted_stale' => 0,
     'errors' => 0,
 ];
 
-// ─── Process each showtime ───
-$db->beginTransaction();
+$normalizedRows = [];
 
 foreach ($movies as $item) {
     $rawTitle = trim($item['movie'] ?? '');
     $rawLocation = trim($item['location'] ?? '');
-    $rawCinema = trim($item['cinema'] ?? '');
     $date = trim($item['date'] ?? '');
     $time = trim($item['time'] ?? '');
     $format = 'Standard';
 
-    if (!$rawTitle || !$date || !$time) continue;
+    if ($rawTitle === '' || $date === '' || $time === '') {
+        continue;
+    }
 
-    // ─── Step 1: Extract format from location ───
     $locationLower = strtolower($rawLocation);
-    foreach ($locationFormats as $suffix => $fmt) {
+    foreach ($locationFormats as $suffix => $mappedFormat) {
         if (str_ends_with($locationLower, $suffix)) {
-            $format = $fmt;
+            $format = $mappedFormat;
             $rawLocation = trim(substr($rawLocation, 0, -strlen($suffix)));
             break;
         }
     }
 
-    // ─── Step 2: Extract format from title ───
     $titleLower = strtolower($rawTitle);
-    foreach ($formatSuffixes as $suffix => $fmt) {
+    foreach ($formatSuffixes as $suffix => $mappedFormat) {
         if (str_ends_with($titleLower, $suffix)) {
-            $format = $fmt;
+            $format = $mappedFormat;
             $rawTitle = trim(substr($rawTitle, 0, -strlen($suffix)));
             break;
         }
     }
 
-    // ─── Step 3: Normalize title ───
-    $normalized = trim(preg_replace('/\s+/', ' ', $rawTitle));
-    $normalized = rtrim($normalized, ',');
+    $normalizedTitle = trim((string) preg_replace('/\s+/', ' ', rtrim($rawTitle, ',')));
+    $lookupKey = strtolower($normalizedTitle);
 
-    // Check overrides first
-    $lookupKey = strtolower($normalized);
     if (isset($titleOverrides[$lookupKey])) {
         $searchTitle = $titleOverrides[$lookupKey];
     } else {
-        $searchTitle = ucwords($normalized);
-        // Capitalize properly
-        $searchTitle = preg_replace_callback('/\b\w+\b/', function($m) {
-            $lower = strtolower($m[0]);
+        $searchTitle = ucfirst(preg_replace_callback('/\b\w+\b/', function ($match) {
+            $lower = strtolower($match[0]);
             $exceptions = ['the', 'a', 'an', 'in', 'of', 'for', 'and', 'or', 'but', 'at', 'by', 'to', 'is', 'it'];
-            if (in_array($lower, $exceptions)) return $lower;
+            if (in_array($lower, $exceptions, true)) {
+                return $lower;
+            }
             return ucfirst($lower);
-        }, $normalized);
-        $searchTitle = ucfirst($searchTitle);
+        }, $normalizedTitle));
     }
 
-    // ─── Step 4: Match movie ───
-    $movieId = matchMovie($db, $localMovies, $searchTitle, $normalized, $lookupKey);
-
+    $movieId = matchMovie($db, $localMovies, $searchTitle, $normalizedTitle, $lookupKey);
     if (!$movieId) {
-        // Auto-create movie if --auto-create flag is set
-        if (in_array('--auto-create', $argv ?? [])) {
-            $movieId = autoCreateMovie($db, $normalized, $searchTitle);
+        if (in_array('--auto-create', $argv ?? [], true)) {
+            $movieId = autoCreateMovie($db, $normalizedTitle);
             if ($movieId) {
                 $stats['auto_created']++;
-                echo "  AUTO-CREATED: $normalized (ID $movieId)\n";
-            } else {
-                $stats['unmatched_movies'][$rawTitle] = ($stats['unmatched_movies'][$rawTitle] ?? 0) + 1;
-                continue;
+                $localMovies[] = ['id' => $movieId, 'title' => $searchTitle, 'slug' => strtolower((string) preg_replace('/[^a-z0-9]+/', '-', $normalizedTitle))];
             }
-        } else {
+        }
+
+        if (!$movieId) {
             $stats['unmatched_movies'][$rawTitle] = ($stats['unmatched_movies'][$rawTitle] ?? 0) + 1;
             continue;
         }
     }
     $stats['matched']++;
 
-    // ─── Step 5: Map location to cinema slug ───
-    $locationKey = strtolower(trim(preg_replace('/\s+/', ' ', $rawLocation)));
+    $locationKey = strtolower(trim((string) preg_replace('/\s+/', ' ', $rawLocation)));
     $cinemaSlug = $locationMap[$locationKey] ?? null;
-
     if (!$cinemaSlug) {
         $stats['unmatched_locations'][$rawLocation] = ($stats['unmatched_locations'][$rawLocation] ?? 0) + 1;
         continue;
     }
 
-    // ─── Step 6: Get cinema ID ───
     static $cinemaCache = [];
-    if (!isset($cinemaCache[$cinemaSlug])) {
-        $st = $db->prepare("SELECT id FROM cinemas WHERE slug = ? AND is_active = 1");
-        $st->execute([$cinemaSlug]);
-        $cinemaCache[$cinemaSlug] = $st->fetchColumn() ?: false;
+    if (!array_key_exists($cinemaSlug, $cinemaCache)) {
+        $cinemaStmt = $db->prepare("SELECT id FROM cinemas WHERE slug = ? AND is_active = 1");
+        $cinemaStmt->execute([$cinemaSlug]);
+        $cinemaCache[$cinemaSlug] = $cinemaStmt->fetchColumn() ?: false;
     }
     $cinemaId = $cinemaCache[$cinemaSlug];
     if (!$cinemaId) {
@@ -215,34 +192,103 @@ foreach ($movies as $item) {
         continue;
     }
 
-    // ─── Step 7: Insert showtime ───
-    try {
-        $stmt = $db->prepare("
-            INSERT INTO showtimes (movie_id, cinema_id, show_date, show_time, format, language)
-            VALUES (?, ?, ?, ?, ?, 'English')
-            ON DUPLICATE KEY UPDATE format = VALUES(format)
-        ");
-        $stmt->execute([$movieId, $cinemaId, $date, $time, $format]);
-        if ($stmt->rowCount() === 1) {
-            $stats['inserted']++;
-        } else {
-            $stats['duplicates']++;
-        }
-    } catch (PDOException $e) {
-        $stats['errors']++;
-        echo "  ERROR: {$e->getMessage()}\n";
-    }
+    $normalizedRows[] = [
+        'movie_id' => (int) $movieId,
+        'cinema_id' => (int) $cinemaId,
+        'show_date' => $date,
+        'show_time' => $time,
+        'format' => $format ?: 'Standard',
+    ];
 }
 
-$db->commit();
+$incomingKeys = [];
+$dedupedRows = [];
+$cinemaScopeIds = [];
 
-// ─── Report ───
+foreach ($normalizedRows as $row) {
+    $key = buildShowtimeKey($row['movie_id'], $row['cinema_id'], $row['show_date'], $row['show_time'], $row['format']);
+    if (isset($incomingKeys[$key])) {
+        $stats['duplicates']++;
+        continue;
+    }
+
+    $incomingKeys[$key] = true;
+    $dedupedRows[] = $row;
+    $cinemaScopeIds[$row['cinema_id']] = true;
+}
+
+$db->beginTransaction();
+
+try {
+    $windowStart = date('Y-m-d');
+    $windowEnd = date('Y-m-d', strtotime('+6 days'));
+
+    if ($cinemaScopeIds) {
+        $cinemaIds = array_map('intval', array_keys($cinemaScopeIds));
+        $placeholders = implode(',', array_fill(0, count($cinemaIds), '?'));
+        $selectStmt = $db->prepare("
+            SELECT id, movie_id, cinema_id, show_date, show_time, format
+            FROM showtimes
+            WHERE cinema_id IN ($placeholders) AND show_date BETWEEN ? AND ?
+        ");
+        $selectStmt->execute([...$cinemaIds, $windowStart, $windowEnd]);
+
+        $deleteIds = [];
+        foreach ($selectStmt->fetchAll() as $existing) {
+            $existingKey = buildShowtimeKey(
+                (int) $existing['movie_id'],
+                (int) $existing['cinema_id'],
+                $existing['show_date'],
+                substr((string) $existing['show_time'], 0, 5),
+                $existing['format'] ?: 'Standard'
+            );
+
+            if (!isset($incomingKeys[$existingKey])) {
+                $deleteIds[] = (int) $existing['id'];
+            }
+        }
+
+        if ($deleteIds) {
+            $deletePlaceholders = implode(',', array_fill(0, count($deleteIds), '?'));
+            $deleteStmt = $db->prepare("DELETE FROM showtimes WHERE id IN ($deletePlaceholders)");
+            $deleteStmt->execute($deleteIds);
+            $stats['deleted_stale'] += count($deleteIds);
+        }
+    }
+
+    $insertStmt = $db->prepare("
+        INSERT INTO showtimes (movie_id, cinema_id, show_date, show_time, format, language)
+        VALUES (?, ?, ?, ?, ?, 'English')
+        ON DUPLICATE KEY UPDATE format = VALUES(format)
+    ");
+
+    foreach ($dedupedRows as $row) {
+        $insertStmt->execute([
+            $row['movie_id'],
+            $row['cinema_id'],
+            $row['show_date'],
+            $row['show_time'],
+            $row['format'],
+        ]);
+
+        if ($insertStmt->rowCount() === 1) {
+            $stats['inserted']++;
+        }
+    }
+
+    $db->commit();
+} catch (Throwable $e) {
+    $db->rollBack();
+    throw $e;
+}
+
 echo "\n=== Import Summary ===\n";
 echo "Total records processed: " . count($movies) . "\n";
 echo "Movies matched: {$stats['matched']}\n";
 echo "Auto-created: {$stats['auto_created']}\n";
 echo "Showtimes inserted: {$stats['inserted']}\n";
 echo "Duplicates skipped: {$stats['duplicates']}\n";
+echo "Stale rows deleted: {$stats['deleted_stale']}\n";
 echo "Errors: {$stats['errors']}\n";
 
 if (!empty($stats['unmatched_movies'])) {
@@ -254,73 +300,79 @@ if (!empty($stats['unmatched_movies'])) {
 
 if (!empty($stats['unmatched_locations'])) {
     echo "\n--- Unmatched Locations ---\n";
-    foreach ($stats['unmatched_locations'] as $loc => $count) {
-        echo "  \"$loc\" ($count times)\n";
+    foreach ($stats['unmatched_locations'] as $location => $count) {
+        echo "  \"$location\" ($count times)\n";
     }
 }
 
 echo "\nDone.\n";
 
-// ═══════════════════════════════════════════════════════
+function buildShowtimeKey(int $movieId, int $cinemaId, string $date, string $time, string $format): string
+{
+    return implode('|', [$movieId, $cinemaId, $date, $time, strtoupper(trim($format ?: 'Standard'))]);
+}
 
-function matchMovie(PDO $db, array $localMovies, string $searchTitle, string $normalized, string $lookupKey): ?int {
-    // 1. Direct match by searchTitle
-    foreach ($localMovies as $m) {
-        if (strcasecmp($m['title'], $searchTitle) === 0) return (int)$m['id'];
+function matchMovie(PDO $db, array $localMovies, string $searchTitle, string $normalized, string $lookupKey): ?int
+{
+    foreach ($localMovies as $movie) {
+        if (strcasecmp($movie['title'], $searchTitle) === 0) {
+            return (int) $movie['id'];
+        }
     }
 
-    // 2. Direct match by normalized
-    foreach ($localMovies as $m) {
-        if (strcasecmp($m['title'], $normalized) === 0) return (int)$m['id'];
+    foreach ($localMovies as $movie) {
+        if (strcasecmp($movie['title'], $normalized) === 0) {
+            return (int) $movie['id'];
+        }
     }
 
-    // 3. Slug match
-    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', trim($normalized)));
-    $slug = trim($slug, '-');
-    foreach ($localMovies as $m) {
-        if ($m['slug'] === $slug) return (int)$m['id'];
+    $slug = trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($normalized)), '-');
+    foreach ($localMovies as $movie) {
+        if ($movie['slug'] === $slug) {
+            return (int) $movie['id'];
+        }
     }
 
-    // 4. LIKE match (first 12 chars)
-    $like = substr($db->quote(substr($normalized, 0, 12)), 1, -1);
     $stmt = $db->prepare("SELECT id FROM movies WHERE title LIKE ? LIMIT 1");
-    $stmt->execute(["%$like%"]);
-    if ($r = $stmt->fetch()) return (int)$r['id'];
+    $stmt->execute(['%' . substr($normalized, 0, 12) . '%']);
+    if ($row = $stmt->fetch()) {
+        return (int) $row['id'];
+    }
 
-    // 5. Word intersection: check if most words match
     $words = explode(' ', strtolower($normalized));
-    foreach ($localMovies as $m) {
-        $mw = explode(' ', strtolower($m['title']));
-        $common = array_intersect($words, $mw);
-        if (count($common) >= min(2, count($words))) return (int)$m['id'];
+    foreach ($localMovies as $movie) {
+        $candidateWords = explode(' ', strtolower($movie['title']));
+        $common = array_intersect($words, $candidateWords);
+        if (count($common) >= min(2, count($words))) {
+            return (int) $movie['id'];
+        }
     }
 
     return null;
 }
 
-/**
- * Auto-create a movie record when a scraped movie doesn't match the DB.
- * Creates a placeholder; admin can later import TMDb data.
- */
-function autoCreateMovie(PDO $db, string $normalized, string $searchTitle): ?int {
-    // Use the normalized title for the DB
+function autoCreateMovie(PDO $db, string $normalized): ?int
+{
     $title = ucwords($normalized);
-    $title = preg_replace_callback('/\b(The|A|An)\b/i', function($m) { return $m[1]; }, $title);
-    
-    $slug = strtolower(preg_replace('/[^a-z0-9]+/', '-', trim($title)));
-    $slug = trim($slug, '-');
-    
-    // Check for duplicate slug
+    $title = preg_replace_callback('/\b(The|A|An)\b/i', function ($match) {
+        return $match[1];
+    }, $title);
+
+    $slug = trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($title)), '-');
+
     $stmt = $db->prepare("SELECT COUNT(*) FROM movies WHERE slug = ?");
     $stmt->execute([$slug]);
-    if ((int)$stmt->fetchColumn() > 0) {
+    if ((int) $stmt->fetchColumn() > 0) {
         $slug .= '-' . time();
     }
-    
+
     try {
-        $stmt = $db->prepare("INSERT INTO movies (title, slug, status, is_showing, created_at) VALUES (?, ?, 'now_showing', 1, NOW())");
+        $stmt = $db->prepare("
+            INSERT INTO movies (title, slug, status, is_showing, created_at)
+            VALUES (?, ?, 'now_showing', 1, NOW())
+        ");
         $stmt->execute([$title, $slug]);
-        return (int)$db->lastInsertId();
+        return (int) $db->lastInsertId();
     } catch (PDOException $e) {
         return null;
     }

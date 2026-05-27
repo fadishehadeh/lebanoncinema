@@ -18,6 +18,8 @@ if (!$movie) {
     exit('Movie not found');
 }
 
+$isComingSoon = ($movie['status'] ?? '') === 'coming_soon';
+
 // Map new TMDb columns to old template variables for backward compatibility
 $movie['poster_url']  = $movie['poster_path'] ?? $movie['poster_url'] ?? '';
 $movie['backdrop']    = $movie['backdrop_path'] ?? $movie['poster_path'] ?? '';
@@ -226,10 +228,16 @@ $jsonLd = [
             ],
             [
                 '@type' => 'Question',
-                'name' => 'Is ' . $movie['title'] . ' now showing in Lebanese cinemas?',
+                'name' => $isComingSoon
+                    ? 'Is ' . $movie['title'] . ' coming soon in Lebanese cinemas?'
+                    : 'Is ' . $movie['title'] . ' showing now in Lebanese cinemas?',
                 'acceptedAnswer' => [
                     '@type' => 'Answer',
-                    'text' => !empty($showtimeRows) ? 'Yes, ' . $movie['title'] . ' is currently showing at ' . $cinemaNamesList . '. Browse showtimes and book your tickets online.' : 'Check LebanonCinema for the latest showtime availability.',
+                    'text' => !empty($showtimeRows)
+                        ? 'Yes, ' . $movie['title'] . ' is currently showing at ' . $cinemaNamesList . '. Browse showtimes and book your tickets online.'
+                        : ($isComingSoon
+                            ? $movie['title'] . ' is currently listed as coming soon. Showtimes will appear once cinemas publish their schedules.'
+                            : 'Check LebanonCinema for the latest showtime availability.'),
                 ],
             ],
         ],
@@ -388,14 +396,14 @@ include __DIR__ . '/includes/header.php';
         <?php endforeach; ?>
     <?php else: ?>
         <div class="empty-state">
-            <p>No showtimes available for this date.</p>
+            <p><?= $isComingSoon ? 'Showtimes will appear here once cinemas publish them.' : 'No showtimes available for this date.' ?></p>
         </div>
     <?php endif; ?>
 </div>
 <?php else: ?>
 <div class="showtimes-wrap">
     <div class="empty-state">
-        <p>No showtimes available in the next 7 days.</p>
+        <p><?= $isComingSoon ? 'Showtimes will appear here once cinemas publish them.' : 'No showtimes available in the next 7 days.' ?></p>
     </div>
 </div>
 <?php endif; ?>
@@ -409,6 +417,8 @@ include __DIR__ . '/includes/header.php';
             Looking for <?= htmlspecialchars($movie['title']) ?> showtimes in Lebanon? 
             <?php if (!empty($showtimeRows)): ?>
             You can watch <?= htmlspecialchars($movie['title']) ?> at <?= htmlspecialchars($cinemaNamesList) ?>.
+            <?php elseif ($isComingSoon): ?>
+            <?= htmlspecialchars($movie['title']) ?> is currently listed as coming soon, and cinemas have not published sessions yet.
             <?php endif; ?>
             <?php if ($movie['duration_min']): ?>Runtime is <?= (int)$movie['duration_min'] ?> minutes.<?php endif; ?>
             <?php if ($movie['release_date']): ?>Released <?= date('F j, Y', strtotime($movie['release_date'])) ?>.<?php endif; ?>

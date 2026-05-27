@@ -97,6 +97,7 @@ foreach ($definitions as $key => $definition) {
 <div class="wrap">
     <div class="nav">
         <a href="<?= _link('/admin') ?>">Dashboard</a>
+        <a href="<?= _link('/admin/catalog.php') ?>">Catalog Review</a>
         <a href="<?= _link('/admin/ads.php') ?>" class="active">AdSense</a>
         <a href="<?= _link('/admin/logout.php') ?>" style="color:#FF3D71;">Logout</a>
     </div>

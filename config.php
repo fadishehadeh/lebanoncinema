@@ -136,6 +136,142 @@ function mapMovieRow(array $m): array {
     return $m;
 }
 
+function catalogPublicNormalizeTitle(string $title): string {
+    $title = trim(preg_replace('/\s+/', ' ', html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    if ($title === '') {
+        return '';
+    }
+
+    $patterns = [
+        '/\s*\((vip|studio\.?15|3d|imax|4dx|gold|standard|gc)\)\s*$/i',
+        '/\s*[-:]\s*(vip|studio\.?15|3d|imax|4dx|gold|standard|gc)\s*$/i',
+        '/\s+(vip|studio\.?15|3d|imax|4dx|gold|standard|gc)\s*$/i',
+    ];
+
+    $changed = true;
+    while ($changed && $title !== '') {
+        $changed = false;
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $title)) {
+                $title = trim((string) preg_replace($pattern, '', $title));
+                $changed = true;
+            }
+        }
+    }
+
+    return $title;
+}
+
+function catalogPublicTitleKey(string $title): string {
+    $normalized = catalogPublicNormalizeTitle($title);
+    $ascii = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+    if ($ascii !== false) {
+        $normalized = $ascii;
+    }
+    $normalized = strtolower($normalized);
+    $normalized = str_replace('&', ' and ', $normalized);
+    $normalized = preg_replace('/[^a-z0-9]+/', ' ', $normalized);
+    $normalized = preg_replace('/\s+/', ' ', $normalized);
+    return trim((string) $normalized);
+}
+
+function mergeCatalogMovieRows(array $rows): array {
+    $merged = [];
+
+    foreach ($rows as $row) {
+        $displayTitle = catalogPublicNormalizeTitle((string) ($row['title'] ?? ''));
+        $key = catalogPublicTitleKey($displayTitle ?: (string) ($row['title'] ?? ''));
+        if ($key === '') {
+            $key = strtolower((string) ($row['slug'] ?? uniqid('movie_', true)));
+        }
+
+        $row['title'] = $displayTitle ?: (string) ($row['title'] ?? '');
+
+        if (!isset($merged[$key])) {
+            $merged[$key] = $row;
+            continue;
+        }
+
+        $current = $merged[$key];
+
+        $currentTitle = catalogPublicNormalizeTitle((string) ($current['title'] ?? ''));
+        $rowTitle = catalogPublicNormalizeTitle((string) ($row['title'] ?? ''));
+        $currentExact = strcasecmp((string) ($current['title'] ?? ''), $currentTitle) === 0;
+        $rowExact = strcasecmp((string) ($row['title'] ?? ''), $rowTitle) === 0;
+
+        if ($rowExact && !$currentExact) {
+            foreach (['slug', 'poster_url', 'poster_path', 'backdrop_path', 'overview', 'synopsis', 'release_date', 'rating', 'vote_average', 'duration_min', 'trailer_key', 'trailer_url'] as $field) {
+                if (!empty($row[$field])) {
+                    $current[$field] = $row[$field];
+                }
+            }
+            $current['title'] = $row['title'];
+        }
+
+        foreach (['showtime_count', 'times_today'] as $field) {
+            if (isset($row[$field])) {
+                $current[$field] = (int) ($current[$field] ?? 0) + (int) ($row[$field] ?? 0);
+            }
+        }
+
+        if (isset($row['showtime_days'])) {
+            $current['showtime_days'] = max((int) ($current['showtime_days'] ?? 0), (int) ($row['showtime_days'] ?? 0));
+        }
+
+        foreach (['has_imax', 'has_vip'] as $field) {
+            if (isset($row[$field])) {
+                $current[$field] = max((int) ($current[$field] ?? 0), (int) ($row[$field] ?? 0));
+            }
+        }
+
+        if (!empty($row['first_today'])) {
+            if (empty($current['first_today']) || strtotime($row['first_today']) < strtotime($current['first_today'])) {
+                $current['first_today'] = $row['first_today'];
+            }
+        }
+
+        if (!empty($row['first_showtime'])) {
+            if (empty($current['first_showtime']) || strtotime($row['first_showtime']) < strtotime($current['first_showtime'])) {
+                $current['first_showtime'] = $row['first_showtime'];
+            }
+        }
+
+        if (!empty($row['hero_times'])) {
+            $allTimes = array_filter(array_merge(
+                explode(',', (string) ($current['hero_times'] ?? '')),
+                explode(',', (string) $row['hero_times'])
+            ));
+            $allTimes = array_values(array_unique($allTimes));
+            sort($allTimes);
+            $current['hero_times'] = implode(',', $allTimes);
+        }
+
+        if (!empty($row['genres'])) {
+            $genres = array_filter(array_map('trim', explode(',', (string) ($current['genres'] ?? ''))));
+            $genres = array_merge($genres, array_filter(array_map('trim', explode(',', (string) $row['genres']))));
+            $genres = array_values(array_unique($genres));
+            $current['genres'] = implode(', ', $genres);
+            $current['genres_list'] = $genres;
+        }
+
+        if (!empty($row['release_date'])) {
+            if (empty($current['release_date']) || strtotime($row['release_date']) < strtotime($current['release_date'])) {
+                $current['release_date'] = $row['release_date'];
+            }
+        }
+
+        foreach (['language', 'status'] as $field) {
+            if (empty($current[$field]) && !empty($row[$field])) {
+                $current[$field] = $row[$field];
+            }
+        }
+
+        $merged[$key] = $current;
+    }
+
+    return array_values($merged);
+}
+
 /**
  * Autoload TmdbService when needed.
  */
@@ -177,6 +313,10 @@ function runSchemaMigrations(PDO $db): void {
         'seo_title VARCHAR(255) DEFAULT NULL AFTER local_trending_score',
         'seo_description TEXT DEFAULT NULL AFTER seo_title',
         'last_synced_at TIMESTAMP NULL DEFAULT NULL AFTER seo_description',
+        'catalog_managed TINYINT(1) DEFAULT 0 AFTER last_synced_at',
+        'catalog_title_key VARCHAR(255) DEFAULT NULL AFTER catalog_managed',
+        'catalog_last_seen_at TIMESTAMP NULL DEFAULT NULL AFTER catalog_title_key',
+        'catalog_meta_json LONGTEXT DEFAULT NULL AFTER catalog_last_seen_at',
     ];
     // Add runtime column (TMDB returns 'runtime', existing DB has 'duration_min')
     try { $db->exec("ALTER TABLE movies ADD COLUMN runtime INT DEFAULT NULL AFTER trailer_key"); } catch (\Exception $e) {}

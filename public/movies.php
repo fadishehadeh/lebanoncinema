@@ -17,12 +17,84 @@ function getMinutesUntil(string $timeStr): int {
 function urgencyLabel(int $mins): ?array {
     if ($mins < 0) return null;
     if ($mins <= 30) return ['class' => 'accent', 'label' => "Starting in {$mins} min"];
-    if ($mins <= 90) return ['class' => 'orange', 'label' => 'Starting in ' . ceil($mins/60) . 'h'];
+    if ($mins <= 90) return ['class' => 'orange', 'label' => 'Starting in ' . ceil($mins / 60) . 'h'];
     return null;
 }
 
-// Fetch all distinct genres
-$stmt = $db->prepare("SELECT DISTINCT genres FROM movies WHERE status = 'now_showing' AND genres IS NOT NULL");
+function renderMovieSection(string $title, array $movies, bool $isComingSoon = false): void {
+    ?>
+    <div class="section-header" style="margin-bottom:8px;">
+        <h2 class="section-title" style="font-size:1.5rem;"><?= htmlspecialchars($title) ?></h2>
+        <?php if (!empty($movies)): ?>
+            <span class="section-link"><?= count($movies) ?> movies</span>
+        <?php endif; ?>
+    </div>
+
+    <?php if (empty($movies)): ?>
+        <div class="empty-state"><p>No movies found.</p></div>
+    <?php else: ?>
+        <div class="movie-grid stagger">
+            <?php foreach ($movies as $i => $m):
+                $urgency = !$isComingSoon && !empty($m['first_today']) ? urgencyLabel(getMinutesUntil($m['first_today'])) : null;
+                $formats = [];
+                if (!$isComingSoon && !empty($m['has_imax'])) $formats[] = 'imax';
+                if (!$isComingSoon && !empty($m['has_vip'])) $formats[] = 'vip';
+            ?>
+            <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
+               data-movie-item
+               data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"
+               data-formats="<?= implode(',', $formats) ?>"
+               data-urgency="<?= !$isComingSoon && !empty($m['first_today']) ? getMinutesUntil($m['first_today']) : -1 ?>">
+                <?php if (!empty($m['poster_url'])): ?>
+                    <img class="poster-card-img" src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
+                <?php else: ?>
+                    <div class="poster-card-img" style="background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);font-size:2.5rem;">
+                        <?= htmlspecialchars(substr($m['title'], 0, 1)) ?>
+                        <span style="font-size:0.5rem;letter-spacing:0.1em;margin-top:4px;">NO POSTER</span>
+                    </div>
+                <?php endif; ?>
+
+                <div class="default-overlay">
+                    <?php if ($urgency): ?>
+                        <span class="poster-card-badge <?= $urgency['class'] ?>" style="position:relative;top:auto;right:auto;display:inline-block;width:fit-content;margin-bottom:6px;"><?= htmlspecialchars($urgency['label']) ?></span>
+                    <?php endif; ?>
+                    <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
+                    <div class="poster-card-meta">
+                        <?php if ($isComingSoon && !empty($m['release_date'])): ?>
+                            <span><?= date('M j, Y', strtotime($m['release_date'])) ?></span>
+                        <?php elseif (!empty($m['genres'])): ?>
+                            <span><?= htmlspecialchars(substr($m['genres'], 0, 30)) ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="poster-card-overlay">
+                    <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
+                    <div class="poster-card-meta">
+                        <?php if (!empty($m['duration_min'])): ?><?= (int)$m['duration_min'] ?> min<?php endif; ?>
+                        <?php if ($isComingSoon): ?>
+                            <?php if (!empty($m['genres'])): ?><?= !empty($m['duration_min']) ? ' · ' : '' ?><?= htmlspecialchars(substr($m['genres'], 0, 30)) ?><?php endif; ?>
+                        <?php else: ?>
+                            <?php if (!empty($m['times_today'])): ?><?= !empty($m['duration_min']) ? ' · ' : '' ?><?= (int)$m['times_today'] ?> showtimes today<?php endif; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php if (!empty($m['rating'])): ?>
+                    <span class="poster-card-badge accent"><?= htmlspecialchars($m['rating']) ?></span>
+                <?php endif; ?>
+            </a>
+            <?php if ((($i + 1) % 8) === 0 && ($i + 1) < count($movies)): ?>
+                <?php renderAd('large-rectangle', ['placement' => 'movies_grid_inline']); ?>
+            <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <?php
+}
+
+// Fetch all distinct genres across both public sections
+$stmt = $db->prepare("SELECT DISTINCT genres FROM movies WHERE status IN ('now_showing', 'coming_soon') AND genres IS NOT NULL");
 $stmt->execute();
 $genreRows = $stmt->fetchAll();
 
@@ -36,8 +108,7 @@ foreach ($genreRows as $row) {
 $allGenres = array_unique($allGenres);
 sort($allGenres);
 
-// Main query
-$sql = "
+$showingSql = "
     SELECT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min, m.language,
         COUNT(DISTINCT s.show_date) AS showtime_days,
         SUM(CASE WHEN s.show_date = CURDATE() THEN 1 ELSE 0 END) AS times_today,
@@ -47,28 +118,58 @@ $sql = "
     FROM movies m
     LEFT JOIN showtimes s ON s.movie_id = m.id AND s.show_date >= CURDATE()
     LEFT JOIN cinemas c ON s.cinema_id = c.id
-    WHERE m.status = 'now_showing'
+    WHERE EXISTS (
+        SELECT 1
+        FROM showtimes sx
+        WHERE sx.movie_id = m.id
+          AND sx.show_date >= CURDATE()
+    )
 ";
 
 if ($genreFilter) {
-    $sql .= " AND m.genres LIKE ?";
+    $showingSql .= " AND m.genres LIKE ?";
 }
 
-$sql .= " GROUP BY m.id ORDER BY times_today DESC, m.title ASC";
+$showingSql .= " GROUP BY m.id ORDER BY times_today DESC, m.title ASC";
 
-$stmt = $db->prepare($sql);
+$stmt = $db->prepare($showingSql);
 if ($genreFilter) {
     $stmt->execute(["%{$genreFilter}%"]);
 } else {
     $stmt->execute();
 }
-$movies = array_map('mapMovieRow', $stmt->fetchAll());
+$showingNow = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll()));
 
-// SEO
+$comingSql = "
+    SELECT m.id, m.title, m.slug, COALESCE(m.poster_path, m.poster_url) AS poster_url, m.rating, m.genres, m.duration_min, m.language, m.release_date
+    FROM movies m
+    WHERE m.status = 'coming_soon'
+      AND NOT EXISTS (
+        SELECT 1
+        FROM showtimes s
+        WHERE s.movie_id = m.id
+          AND s.show_date >= CURDATE()
+      )
+";
+
+if ($genreFilter) {
+    $comingSql .= " AND m.genres LIKE ?";
+}
+
+$comingSql .= " ORDER BY m.release_date ASC, m.title ASC";
+
+$stmt = $db->prepare($comingSql);
+if ($genreFilter) {
+    $stmt->execute(["%{$genreFilter}%"]);
+} else {
+    $stmt->execute();
+}
+$comingSoon = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll()));
+
 $siteUrl = rtrim(SITE_URL, '/');
 $canonical = '/movies' . ($genreFilter ? '?genre=' . urlencode($genreFilter) : '');
-$pageTitle = ($genreFilter ? htmlspecialchars($genreFilter) . ' Movies ' : 'Movies ') . 'Showing Now in Lebanon — ' . SITE_NAME;
-$pageDescription = 'Browse ' . ($genreFilter ? htmlspecialchars($genreFilter) . ' ' : '') . 'movies showing now at cinemas across Lebanon. Find showtimes, watch trailers, and book tickets for ' . ($genreFilter ? htmlspecialchars($genreFilter) . ' ' : '') . 'films at VOX, Grand, Empire and more.';
+$pageTitle = ($genreFilter ? htmlspecialchars($genreFilter) . ' Movies ' : 'Movies ') . 'Showing Now and Coming Soon in Lebanon - ' . SITE_NAME;
+$pageDescription = 'Browse ' . ($genreFilter ? htmlspecialchars($genreFilter) . ' ' : '') . 'movies showing now and coming soon in Lebanon. Open movie details, compare showtimes, and track upcoming releases across Lebanese cinemas.';
 $breadcrumbs = $genreFilter ? [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
     ['pos' => 3, 'name' => $genreFilter, 'url' => $canonical],
@@ -90,14 +191,6 @@ include __DIR__ . '/includes/header.php';
 
 <div class="page-enter">
 
-<div class="section-header" style="margin-bottom:8px;">
-    <h2 class="section-title" style="font-size:1.5rem;">Now Showing</h2>
-    <?php if (!empty($movies)): ?>
-        <span class="section-link"><?= count($movies) ?> movies</span>
-    <?php endif; ?>
-</div>
-
-<!-- Genre Filter -->
 <?php if (!empty($allGenres)): ?>
 <div class="genre-strip">
     <a href="<?= e_link('/movies') ?>" class="genre-pill <?= !$genreFilter ? 'active' : '' ?>">All</a>
@@ -110,61 +203,11 @@ include __DIR__ . '/includes/header.php';
 </div>
 <?php endif; ?>
 
-<!-- Movie Grid -->
-<?php if (empty($movies)): ?>
-    <div class="empty-state"><p>No movies found.</p></div>
-<?php else: ?>
-    <div class="movie-grid stagger">
-        <?php foreach ($movies as $i => $m):
-            $urgency = $m['first_today'] ? urgencyLabel(getMinutesUntil($m['first_today'])) : null;
-            $formats = [];
-            if ($m['has_imax']) $formats[] = 'imax';
-            if ($m['has_vip']) $formats[] = 'vip';
-        ?>
-        <a href="<?= e_link('/movies/' . rawurlencode($m['slug'])) ?>" class="poster-card"
-           data-movie-item
-           data-genres="<?= htmlspecialchars(strtolower($m['genres'] ?? '')) ?>"
-           data-formats="<?= implode(',', $formats) ?>"
-           data-urgency="<?= $m['first_today'] ? getMinutesUntil($m['first_today']) : -1 ?>">
-            <?php if ($m['poster_url']): ?>
-                <img class="poster-card-img" src="<?= htmlspecialchars($m['poster_url']) ?>" alt="<?= htmlspecialchars($m['title']) ?>" loading="lazy">
-            <?php else: ?>
-                <div class="poster-card-img" style="background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);font-size:2.5rem;">
-                    <?= htmlspecialchars(substr($m['title'], 0, 1)) ?>
-                    <span style="font-size:0.5rem;letter-spacing:0.1em;margin-top:4px;">NO POSTER</span>
-                </div>
-            <?php endif; ?>
+<?php renderMovieSection('Showing now', $showingNow, false); ?>
 
-            <!-- Always-visible bottom overlay -->
-            <div class="default-overlay">
-                <?php if ($urgency): ?>
-                    <span class="poster-card-badge <?= $urgency['class'] ?>" style="position:relative;top:auto;right:auto;display:inline-block;width:fit-content;margin-bottom:6px;"><?= htmlspecialchars($urgency['label']) ?></span>
-                <?php endif; ?>
-                <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
-                <div class="poster-card-meta">
-                    <?php if ($m['genres']): ?><span><?= htmlspecialchars(substr($m['genres'], 0, 30)) ?></span><?php endif; ?>
-                </div>
-            </div>
+<?php renderAd('leaderboard', ['placement' => 'homepage_top']); ?>
 
-            <!-- Hover overlay -->
-            <div class="poster-card-overlay">
-                <div class="poster-card-title"><?= htmlspecialchars($m['title']) ?></div>
-                <div class="poster-card-meta">
-                    <?php if ($m['duration_min']): ?><?= (int)$m['duration_min'] ?> min · <?php endif; ?>
-                    <?php if ($m['times_today']): ?><?= (int)$m['times_today'] ?> showtimes today<?php endif; ?>
-                </div>
-            </div>
-
-            <?php if ($m['rating']): ?>
-                <span class="poster-card-badge accent"><?= htmlspecialchars($m['rating']) ?></span>
-            <?php endif; ?>
-        </a>
-        <?php if ((($i + 1) % 8) === 0 && ($i + 1) < count($movies)): ?>
-            <?php renderAd('large-rectangle', ['placement' => 'movies_grid_inline']); ?>
-        <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
-<?php endif; ?>
+<?php renderMovieSection('Coming soon', $comingSoon, true); ?>
 
 </div><!-- end page-enter -->
 

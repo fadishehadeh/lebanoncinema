@@ -13,7 +13,9 @@ const URLS = [
 let allMovies = [];
 
 const headers = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+  'Cache-Control': 'no-cache',
+  Pragma: 'no-cache',
 };
 
 // Helper: delay between requests
@@ -38,19 +40,38 @@ function normalizeTime(timeStr) {
   return `${String(hours).padStart(2, '0')}:${minutes}`;
 }
 
+function getBeirutDateString() {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Beirut',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date());
+  const values = {};
+  for (const part of parts) {
+    if (part.type !== 'literal') {
+      values[part.type] = part.value;
+    }
+  }
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 // Parse date strings like "Sunday, 24 May 2026" → "2026-05-24"
 function parseDate(dateStr) {
-  if (!dateStr) return new Date().toISOString().split('T')[0];
+  if (!dateStr) return getBeirutDateString();
 
   // Remove day name prefix (Sunday, 25 May 2026 → 25 May 2026)
   const cleanDate = dateStr.replace(/^[A-Za-z]+,\s*/, '').trim();
   const parsed = new Date(cleanDate);
 
   if (isNaN(parsed.getTime())) {
-    return new Date().toISOString().split('T')[0];
+    return getBeirutDateString();
   }
 
-  return parsed.toISOString().split('T')[0];
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, '0');
+  const day = String(parsed.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 // Validate movie record
@@ -68,8 +89,16 @@ function isValidMovie(record) {
 // Get next 7 dates in YYYYMMDD format for query params
 function getNextDates(count = 7) {
   const dates = [];
+  const base = new Date(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Beirut',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date())
+  );
   for (let i = 0; i < count; i++) {
-    const d = new Date();
+    const d = new Date(base);
     d.setDate(d.getDate() + i);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -118,8 +147,8 @@ async function scrapeVoxCinemas() {
           $$('div.dates').each((i, datesEl) => {
             const location = $$(datesEl).find('h3.highlight').text().trim();
 
-            // Vox Cinemas groups showtimes by screen type (GOLD, Standard, etc)
-            $$(datesEl).find('li').each((screenIdx, screenEl) => {
+            // Only parse top-level format groups. Nested <li> elements are individual sessions.
+            $$(datesEl).find('ol.showtimes > li').each((screenIdx, screenEl) => {
               const screenType = $$(screenEl).find('strong').text().trim();
 
               $$(screenEl).find('a.action.showtime').each((j, timeEl) => {
@@ -293,54 +322,49 @@ async function scrapeGrandCinema() {
       try {
         const detailUrl = `${baseUrl}/movie/${slug}/en`;
         const detailResponse = await axios.get(detailUrl, { headers, timeout: 15000 });
-        const pageText = detailResponse.data;
-        
-        // Extract title from <title> tag
-        const titleMatch = pageText.match(/<title>([^<]+)<\/title>/i);
-        const title = titleMatch ? titleMatch[1].trim() : (movieTitles[slug] || slug.replace(/-/g, ' '));
+        const $$ = cheerio.load(detailResponse.data);
 
-        // Extract dates - looking for YYYY-MM-DD patterns
-        const dateMatches = pageText.match(/\d{4}-\d{2}-\d{2}/g) || [];
-        const uniqueDates = [...new Set(dateMatches)].filter(d => d >= new Date().toISOString().split('T')[0]);
+        const title = $$('.movietitle').first().text().trim()
+          || $$('title').first().text().trim()
+          || movieTitles[slug]
+          || slug.replace(/-/g, ' ');
 
-        // Extract times - looking for HH:MM patterns
-        const timeMatches = pageText.match(/\b([0-1]?[0-9]:[0-5][0-9])\b/g) || [];
-        const uniqueTimes = [...new Set(timeMatches)].filter(t => {
-          const h = parseInt(t.split(':')[0]);
-          return h >= 8 && h <= 23; // Only reasonable showtimes
-        });
+        $$('.search-div').each((_, rowEl) => {
+          const row = $$(rowEl);
+          const dateLabel = row.find('.search-item').first().text().replace(/\s+/g, ' ').trim();
+          const cinemaName = row.find('.leftonmobile').first().text().replace(/\s+/g, ' ').trim();
 
-        // Check for VIP/STD in page
-        const hasVIP = /VIP/i.test(pageText);
-        const formats = hasVIP ? ['VIP', 'STD'] : ['STD'];
-
-        // Get associated cinemas for this movie
-        const cinemaIds = movieCinemas[slug] || [];
-        const cinemaNames = cinemaIds.map(id => {
-          const map = {5: 'ABC Achrafieh', 6: 'Grand ABC Dbayeh', 7: 'Grand ABC Verdun', 8: 'The Spot Saida', 22: 'Las salinas'};
-          return map[id];
-        }).filter(Boolean);
-
-        const validBranches = cinemaNames.length > 0 ? cinemaNames : branchNames;
-
-        // Generate entries for each date + time + cinema + format
-        for (const dateStr of uniqueDates) {
-          for (const timeStr of uniqueTimes) {
-            const timeNorm = normalizeTime(timeStr);
-            for (const branch of validBranches) {
-              for (const fmt of formats) {
-                movies.push({
-                  movie: title,
-                  date: dateStr,
-                  time: timeNorm,
-                  location: `${branch} - ${fmt}`,
-                  cinema: 'Grand Cinema',
-                  url: detailUrl
-                });
-              }
-            }
+          if (!dateLabel || !cinemaName) {
+            return;
           }
-        }
+
+          const dateStr = dateLabel.toLowerCase() === 'today' ? getBeirutDateString() : dateLabel;
+
+          row.find('.experience-search-div').each((__, expEl) => {
+            const exp = $$(expEl);
+            if (exp.hasClass('ticketname')) {
+              return;
+            }
+
+            const formatRaw = (exp.attr('data-experience') || '').trim() || 'STD';
+            exp.find('a.time-search-element').each((___, timeEl) => {
+              const timeRaw = $$(timeEl).attr('data-time') || $$(timeEl).text().trim();
+              const timeNorm = normalizeTime(timeRaw);
+              if (!timeNorm || timeNorm === 'Not specified') {
+                return;
+              }
+
+              movies.push({
+                movie: title,
+                date: dateStr,
+                time: timeNorm,
+                location: `${cinemaName} - ${formatRaw}`,
+                cinema: 'Grand Cinema',
+                url: detailUrl
+              });
+            });
+          });
+        });
 
       } catch (error) {
         console.warn(`  ⚠ Error fetching ${slug}: ${error.message}`);

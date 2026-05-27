@@ -7,6 +7,7 @@
  *   /admin/movies         → Movie list + search + import
  *   /admin/movie-edit?id=X→ Edit movie
  *   /admin/tmdb-sync      → Sync logs & trigger
+ *   /admin/catalog.php    → Weekly catalog review/import
  *
  * Uses TmdbService for API calls (admin-only).
  */
@@ -178,6 +179,7 @@ $logs = $db->query("SELECT * FROM tmdb_sync_logs ORDER BY created_at DESC LIMIT 
         <a href="?view=dashboard" class="<?= $view === 'dashboard' ? 'active' : '' ?>">Dashboard</a>
         <a href="?view=movies" class="<?= $view === 'movies' ? 'active' : '' ?>">Movies</a>
         <a href="?view=import" class="<?= $view === 'import' ? 'active' : '' ?>">TMDb Import</a>
+        <a href="catalog.php">Catalog Review</a>
         <a href="?view=logs" class="<?= $view === 'logs' ? 'active' : '' ?>">Sync Logs</a>
         <a href="ads.php">AdSense</a>
     </div>
