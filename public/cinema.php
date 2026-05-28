@@ -92,6 +92,7 @@ $jsonLd = [
         '@id' => $siteUrl . '/cinemas/' . rawurlencode($slug) . '#theater',
         'name' => $cinema['name'],
         'url' => $siteUrl . '/cinemas/' . rawurlencode($slug),
+        'inLanguage' => 'en',
         'description' => $cinema['chain_name'] . ' cinema in ' . $cinema['city'] . ($cinema['area'] ? ', ' . $cinema['area'] : '') . '. ' . ($cinema['has_imax'] ? 'Features IMAX. ' : '') . ($cinema['has_vip'] ? 'VIP seating available. ' : '') . 'View movie showtimes and book tickets.',
         'telephone' => '',
         'address' => [
@@ -116,6 +117,7 @@ $jsonLd = [
     ],
     [
         '@type' => 'FAQPage',
+        'inLanguage' => 'en',
         'mainEntity' => [
             [
                 '@type' => 'Question',

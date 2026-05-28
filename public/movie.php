@@ -197,6 +197,7 @@ $jsonLd = [
         '@id' => $canonicalUrl . '#movie',
         'name' => $movie['title'],
         'url' => $canonicalUrl,
+        'inLanguage' => 'en',
         'image' => $movie['poster_url'] ? ['@type' => 'ImageObject', 'url' => $movie['poster_url'], 'caption' => $movie['title'] . ' poster'] : '',
         'description' => $movie['synopsis'] ?? '',
         'datePublished' => $movie['release_date'] ?? '',
@@ -213,6 +214,7 @@ $jsonLd = [
     ...$screenings,
     [
         '@type' => 'FAQPage',
+        'inLanguage' => 'en',
         'mainEntity' => [
             [
                 '@type' => 'Question',
@@ -227,7 +229,7 @@ $jsonLd = [
                 'name' => 'What time is ' . $movie['title'] . ' showing today in Beirut?',
                 'acceptedAnswer' => [
                     '@type' => 'Answer',
-                    'text' => $movie['title'] . ' showtimes vary by cinema location. Check the full schedule at VOX, Grand, Empire, CinemaCity and other cinemas in Lebanon on LebanonCinema.',
+                    'text' => $movie['title'] . ' showtimes vary by cinema location. Check the full schedule at VOX, Grand, CinemaCity, Cinemall, and other cinemas in Lebanon on LebanonCinema.',
                 ],
             ],
             [

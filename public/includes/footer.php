@@ -19,6 +19,7 @@ try {
         FROM chains ch
         JOIN cinemas c ON c.chain_id = ch.id
         WHERE c.is_active = 1
+          AND ch.name NOT IN ('Empire Cinemas', 'Stargate')
         GROUP BY ch.id
         ORDER BY cinema_count DESC, ch.name ASC
         LIMIT 6
@@ -72,10 +73,8 @@ try {
             <?php else: ?>
                 <a href="<?= _link('/cinemas') ?>">VOX Cinemas</a>
                 <a href="<?= _link('/cinemas') ?>">Grand Cinemas</a>
-                <a href="<?= _link('/cinemas') ?>">Empire Cinemas</a>
                 <a href="<?= _link('/cinemas') ?>">CinemaCity</a>
                 <a href="<?= _link('/cinemas') ?>">Cinemall</a>
-                <a href="<?= _link('/cinemas') ?>">Stargate</a>
             <?php endif; ?>
         </div>
         <div>

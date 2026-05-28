@@ -14,8 +14,41 @@
  *   $canonical = '/movies/inception';
  *   $jsonLd = ['@type' => 'Movie', 'name' => 'Inception'];
  */
-$canonical    = $canonical ?? $_SERVER['REQUEST_URI'];
-$pageDescription = $pageDescription ?? 'Discover what\'s playing at cinemas across Lebanon. Browse showtimes, watch trailers, and book tickets for VOX, Grand, Empire and more.';
+if (!function_exists('normalizeCanonicalUrl')) {
+    function normalizeCanonicalUrl(?string $canonical, string $siteUrl): string {
+        $siteUrl = rtrim($siteUrl, '/');
+        $basePath = parse_url($siteUrl, PHP_URL_PATH) ?: '';
+        $basePath = rtrim($basePath, '/');
+
+        if ($canonical === null || $canonical === '') {
+            $canonical = $_SERVER['REQUEST_URI'] ?? '/';
+        }
+
+        if (str_starts_with($canonical, 'http://') || str_starts_with($canonical, 'https://')) {
+            return $canonical;
+        }
+
+        $path = $canonical;
+        $query = '';
+        if (str_contains($canonical, '?')) {
+            [$path, $query] = explode('?', $canonical, 2);
+            $query = '?' . $query;
+        }
+
+        $path = $path !== '' ? $path : '/';
+        if ($basePath !== '' && str_starts_with($path, $basePath . '/')) {
+            $path = substr($path, strlen($basePath));
+        } elseif ($basePath !== '' && $path === $basePath) {
+            $path = '/';
+        }
+
+        $path = '/' . ltrim($path, '/');
+        return $siteUrl . $path . $query;
+    }
+}
+
+$canonical    = $canonical ?? null;
+$pageDescription = $pageDescription ?? 'Discover what\'s playing at cinemas across Lebanon. Browse showtimes, watch trailers, and book tickets for VOX, Grand, CinemaCity, and more.';
 $pageImage    = $pageImage ?? '';
 $ogType       = $ogType ?? 'website';
 $jsonLd       = $jsonLd ?? [];
@@ -23,7 +56,7 @@ $breadcrumbs  = $breadcrumbs ?? [];
 $pageUpdatedAt = $pageUpdatedAt ?? null;
 $pageRobots   = $pageRobots ?? 'index, follow, max-snippet:-1, max-image-preview:large';
 $siteUrl      = rtrim(SITE_URL, '/');
-$canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonical);
+$canonicalUrl = normalizeCanonicalUrl($canonical, SITE_URL);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -540,30 +573,39 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 
         .search-section-home {
             display: grid;
-            gap: 20px;
-            padding: 28px;
-            border-radius: 26px;
+            gap: 14px;
+            padding: 20px 22px;
+            border-radius: 22px;
             background: linear-gradient(180deg, rgba(15,15,15,0.96), rgba(10,10,10,0.96));
             border: 1px solid rgba(255,255,255,0.06);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.32);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.24);
+            align-items: end;
+            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
         }
 
         .search-section-copy h2 {
-            font-size: clamp(1.35rem, 2.2vw, 2rem);
-            margin-bottom: 8px;
+            font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+            margin-bottom: 6px;
         }
         .search-section-copy p {
             color: var(--text-muted);
-            max-width: 56ch;
+            max-width: 46ch;
+            font-size: 0.92rem;
         }
         .section-kicker {
             display: inline-block;
-            margin-bottom: 10px;
-            font-size: 0.72rem;
+            margin-bottom: 8px;
+            font-size: 0.68rem;
             text-transform: uppercase;
             letter-spacing: 0.14em;
             color: #ff8f98;
             font-weight: 700;
+        }
+
+        .search-section-actions {
+            display: grid;
+            gap: 10px;
+            align-items: center;
         }
 
         .search-wrap {
@@ -571,13 +613,13 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
         }
         .search-input {
             width: 100%;
-            height: 56px;
-            padding: 0 48px 0 20px;
-            border-radius: var(--radius-xl);
+            height: 50px;
+            padding: 0 46px 0 18px;
+            border-radius: 18px;
             background: var(--card);
             border: 1px solid var(--border);
             color: var(--text);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             outline: none;
             transition: all 0.3s var(--ease);
             font-family: inherit;
@@ -601,7 +643,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
 
         .search-dropdown {
             position: absolute;
-            top: 64px;
+            top: 58px;
             left: 0;
             right: 0;
             background: var(--card);
@@ -614,6 +656,24 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             display: none;
         }
         .search-dropdown.open { display: block; }
+
+        .search-browse-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-decoration: none;
+            width: fit-content;
+        }
+        .search-browse-link:hover {
+            color: var(--text);
+        }
+        .search-browse-link::after {
+            content: "→";
+            font-size: 0.95rem;
+            line-height: 1;
+        }
 
         .search-group-label {
             padding: 12px 16px 6px;
@@ -675,6 +735,13 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             justify-content: flex-start;
         }
         .chips-row::-webkit-scrollbar { display: none; }
+
+        @media (max-width: 900px) {
+            .search-section-home {
+                grid-template-columns: 1fr;
+                align-items: stretch;
+            }
+        }
 
         .chip {
             display: inline-flex;
@@ -1793,7 +1860,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
             .carousel { padding: 0 16px; gap: 6px; }
             .home-discovery-shell { padding: 0 16px 16px; }
             .search-section { padding: 0; }
-            .search-section-home { padding: 20px; border-radius: 22px; }
+            .search-section-home { padding: 18px; border-radius: 20px; }
             .chips-row { padding: 0; }
             .detail-hero { padding: 24px 16px; gap: 20px; flex-direction: column; align-items: stretch; }
             .detail-poster { width: min(220px, 56vw); margin: 0 auto; }
@@ -1834,8 +1901,8 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
                 "@id": "<?= $siteUrl ?>/#organization",
                 "name": "<?= htmlspecialchars(SITE_NAME) ?>",
                 "url": "<?= $siteUrl ?>",
-                "description": "Lebanon's cinema showtimes guide. Find movies, cinemas, and showtimes across VOX, Grand, Empire, CinemaCity and more.",
-                "areaServed": "LB",
+                "inLanguage": "en",
+                "description": "Lebanon's cinema showtimes guide. Find movies, cinemas, and showtimes across VOX, Grand, CinemaCity, Cinemall, and more.",
                 "areaServed": {
                     "@type": "Country",
                     "name": "Lebanon"
@@ -1846,6 +1913,7 @@ $canonicalUrl = str_starts_with($canonical, 'http') ? $canonical : url($canonica
                 "@id": "<?= $siteUrl ?>/#website",
                 "url": "<?= $siteUrl ?>",
                 "name": "<?= htmlspecialchars(SITE_NAME) ?>",
+                "inLanguage": "en",
                 "publisher": { "@id": "<?= $siteUrl ?>/#organization" },
                 "potentialAction": {
                     "@type": "SearchAction",

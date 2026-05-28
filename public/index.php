@@ -85,25 +85,27 @@ $stmt->execute();
 $comingSoon = mergeCatalogMovieRows(array_map('mapMovieRow', $stmt->fetchAll() ?? []));
 
 $pageTitle = 'Showing Now and Coming Soon Movies in Lebanon | ' . SITE_NAME;
-$pageDescription = 'Browse showing now and coming soon movies across Lebanon. Compare cinema showtimes, open movie details, and track what is playing next at VOX, Grand, CinemaCity, Cinemall and more.';
+$pageDescription = 'Browse showing now and coming soon movies across Lebanon, including Beirut, Jounieh, Tripoli, Dbayeh, Saida, and Zahle. Compare cinema showtimes, open movie details, and track what is playing next at VOX, Grand, CinemaCity, Cinemall and more.';
 $pageUpdatedAt = date('Y-m-d H:i:s');
 $jsonLd = [[
     '@type' => 'CollectionPage',
     '@id' => url('/') . '#homepage',
     'name' => $pageTitle,
     'description' => $pageDescription,
+    'inLanguage' => 'en',
     'isPartOf' => ['@id' => rtrim(SITE_URL, '/') . '/#website'],
 ], [
     '@type' => 'FAQPage',
+    'inLanguage' => 'en',
     'mainEntity' => [
         [
             '@type' => 'Question',
             'name' => 'Where can I compare cinema showtimes in Lebanon?',
-            'acceptedAnswer' => [
-                '@type' => 'Answer',
-                'text' => 'LebanonCinema compares movie showtimes across Lebanese cinemas including VOX, Grand, CinemaCity, Cinemall, and Empire.',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => 'LebanonCinema compares movie showtimes across Lebanese cinemas including VOX, Grand, CinemaCity, Cinemall, and other active locations.',
+                ],
             ],
-        ],
         [
             '@type' => 'Question',
             'name' => 'What movies are showing in Lebanon now?',
@@ -260,35 +262,12 @@ require_once __DIR__ . '/includes/ad.php';
 </section>
 <?php endif; ?>
 
-<section class="home-discovery-shell">
-    <div class="search-section search-section-home">
-        <div class="search-section-copy">
-            <span class="section-kicker">Start Fast</span>
-            <h2>Search a movie, cinema, or genre</h2>
-            <p>Jump straight into tonight's lineup or narrow the page by format and mood.</p>
-        </div>
-        <div class="search-wrap">
-            <input class="search-input" id="hero-search" placeholder="Search movies, cinemas, genres..." autocomplete="off">
-            <div class="search-icon"><i data-lucide="search"></i></div>
-            <div class="search-dropdown" id="search-dropdown"></div>
-        </div>
-        <div class="chips-row">
-            <button class="chip active" data-filter="all">All Movies</button>
-            <button class="chip" data-filter="vip">VIP & IMAX</button>
-            <button class="chip" data-filter="action">Action</button>
-            <button class="chip" data-filter="comedy">Comedy</button>
-            <button class="chip" data-filter="horror">Horror</button>
-            <button class="chip" data-filter="family">Family</button>
-        </div>
-    </div>
-</section>
-
 <section class="section" style="padding-top:0;">
-    <div class="seo-summary" style="padding:0 24px 12px;">
-        <p style="color:var(--text-muted);max-width:920px;line-height:1.7;">
+    <div class="seo-summary" style="padding:0 24px 12px;text-align:center;">
+        <p style="color:var(--text-muted);max-width:920px;line-height:1.7;margin:0 auto;">
             LebanonCinema tracks showing now and coming soon movies across Lebanon with direct routes into movie pages, cinema pages, and city-specific showtime pages. <?= htmlspecialchars(seo_updated_label($pageUpdatedAt)) ?>.
         </p>
-        <p style="color:var(--text-muted);font-size:0.9rem;margin-top:10px;">
+        <p style="color:var(--text-muted);font-size:0.9rem;margin:10px auto 0;max-width:920px;">
             What you'll find on this page: featured movies, live cinema cards, current releases, coming soon titles, and search paths into local showtimes.
         </p>
     </div>

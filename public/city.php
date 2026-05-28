@@ -78,10 +78,12 @@ $jsonLd = [
         '@type' => 'City',
         'name' => $cityName,
         'url' => $siteUrl . $canonical,
+        'inLanguage' => 'en',
         'containedIn' => ['@type' => 'Country', 'name' => 'Lebanon'],
     ],
     [
         '@type' => 'FAQPage',
+        'inLanguage' => 'en',
         'mainEntity' => [
             [
                 '@type' => 'Question',

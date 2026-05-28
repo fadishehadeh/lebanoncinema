@@ -98,13 +98,14 @@ sort($trendingGenres);
 $siteUrl = rtrim(SITE_URL, '/');
 $canonical = '/search' . ($q ? '?q=' . urlencode($q) : '');
 $pageTitle = ($q ? htmlspecialchars($q) . ' — ' : '') . 'Search — ' . SITE_NAME;
-$pageDescription = $q ? 'Search results for "' . htmlspecialchars($q) . '" — find movies, cinemas, and showtimes across Lebanon.' : 'Search movies, cinemas, and showtimes across Lebanon. Find what\'s playing at VOX, Grand, Empire and more.';
+$pageDescription = $q ? 'Search results for "' . htmlspecialchars($q) . '" — find movies, cinemas, and showtimes across Lebanon.' : 'Search movies, cinemas, and showtimes across Lebanon, including Beirut, Jounieh, Tripoli, Dbayeh, Saida, and Zahle. Find what\'s playing at VOX, Grand, CinemaCity, Cinemall, and more.';
 $breadcrumbs = [['pos' => 2, 'name' => 'Search', 'url' => $canonical]];
 $jsonLd = [[
     '@type' => 'SearchResultsPage',
     '@id' => $siteUrl . $canonical . '#page',
     'name' => $pageTitle,
     'description' => $pageDescription,
+    'inLanguage' => 'en',
     'isPartOf' => ['@id' => $siteUrl . '/#website'],
 ]];
 require_once __DIR__ . '/includes/ad.php';

@@ -60,7 +60,7 @@ $cinemas = $stmt->fetchAll() ?? [];
 $siteUrl = rtrim(SITE_URL, '/');
 $canonical = '/genres/' . rawurlencode($genreSlug);
 $pageTitle = $genreName . ' Movies Showing Now in Lebanon — ' . SITE_NAME;
-$pageDescription = 'Browse ' . $genreName . ' movies playing at cinemas across Lebanon. Find showtimes, watch trailers, and book tickets for ' . $genreName . ' films at VOX, Grand, Empire and more.';
+$pageDescription = 'Browse ' . $genreName . ' movies playing at cinemas across Lebanon. Find showtimes, watch trailers, and book tickets for ' . $genreName . ' films at VOX, Grand, CinemaCity, and more.';
 $pageImage = $movies[0]['poster_url'] ?? '';
 $breadcrumbs = [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
@@ -171,7 +171,7 @@ include __DIR__ . '/includes/header.php';
         <h2 style="font-size:1.2rem;margin-bottom:16px;"><?= htmlspecialchars($genreName) ?> Movies in Lebanon</h2>
         <p style="color:var(--text-muted);line-height:1.7;margin-bottom:12px;">
             Looking for <?= strtolower($genreName) ?> movies in Lebanon? There are <?= count($movies) ?> <?= strtolower($genreName) ?> films currently showing at cinemas across Lebanon.
-            Browse showtimes for top <?= strtolower($genreName) ?> movies at VOX Cinemas, Grand Cinemas, Empire, CinemaCity and more.
+            Browse showtimes for top <?= strtolower($genreName) ?> movies at VOX Cinemas, Grand Cinemas, CinemaCity, and more.
             Watch trailers, read synopses, and book your tickets online.
         </p>
         <p style="color:var(--text-muted);line-height:1.7;">

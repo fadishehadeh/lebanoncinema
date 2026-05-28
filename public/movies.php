@@ -173,7 +173,7 @@ $pageTitle = $genreFilter
     : 'Showing Now and Coming Soon Movies in Lebanon | ' . SITE_NAME;
 $pageDescription = $genreFilter
     ? 'Browse ' . $genreFilter . ' movies showing in Lebanon. Compare cinema showtimes, open movie details, and track upcoming releases in one place.'
-    : 'Browse showing now and coming soon movies in Lebanon. Compare cinema showtimes, open movie details, and track what is playing next across Lebanese cinemas.';
+    : 'Browse showing now and coming soon movies in Lebanon, including Beirut, Jounieh, Tripoli, Dbayeh, Saida, and Zahle. Compare cinema showtimes, open movie details, and track what is playing next across Lebanese cinemas.';
 $pageUpdatedAt = date('Y-m-d H:i:s');
 $breadcrumbs = $genreFilter ? [
     ['pos' => 2, 'name' => 'Movies', 'url' => '/movies'],
@@ -187,9 +187,11 @@ $jsonLd = [[
     '@id' => $siteUrl . $canonical . '#page',
     'name' => $pageTitle,
     'description' => $pageDescription,
+    'inLanguage' => 'en',
     'isPartOf' => ['@id' => $siteUrl . '/#website'],
 ], [
     '@type' => 'FAQPage',
+    'inLanguage' => 'en',
     'mainEntity' => [
         [
             '@type' => 'Question',
@@ -202,11 +204,11 @@ $jsonLd = [[
         [
             '@type' => 'Question',
             'name' => 'Where can I compare movie showtimes in Lebanon?',
-            'acceptedAnswer' => [
-                '@type' => 'Answer',
-                'text' => 'Use LebanonCinema to compare movie showtimes across VOX, Grand, CinemaCity, Cinemall, Empire, and other Lebanese cinemas.',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => 'Use LebanonCinema to compare movie showtimes across VOX, Grand, CinemaCity, Cinemall, and other Lebanese cinemas.',
+                ],
             ],
-        ],
     ],
 ]];
 

@@ -37,7 +37,7 @@ foreach ($cinemaRows as $row) {
 
 $canonical = '/cinemas';
 $pageTitle = 'Cinemas in Lebanon | ' . SITE_NAME;
-$pageDescription = 'Find cinemas in Lebanon including VOX, Grand, Empire, CinemaCity, Cinemall and more. Open each cinema page for today\'s movies, facilities, and showtime links.';
+$pageDescription = 'Find cinemas in Lebanon including VOX, Grand, CinemaCity, Cinemall and more. Open each cinema page for today\'s movies, facilities, and showtime links.';
 $pageUpdatedAt = date('Y-m-d H:i:s');
 $breadcrumbs = [['pos' => 2, 'name' => 'Cinemas', 'url' => '/cinemas']];
 $jsonLd = [[
@@ -52,11 +52,11 @@ $jsonLd = [[
         [
             '@type' => 'Question',
             'name' => 'Which cinemas are active in Lebanon?',
-            'acceptedAnswer' => [
-                '@type' => 'Answer',
-                'text' => count($cinemaRows) . ' active cinema locations are listed on LebanonCinema across chains such as VOX, Grand, Empire, CinemaCity, and Cinemall.',
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => count($cinemaRows) . ' active cinema locations are listed on LebanonCinema across chains such as VOX, Grand, CinemaCity, and Cinemall.',
+                ],
             ],
-        ],
         [
             '@type' => 'Question',
             'name' => 'How do I compare cinema showtimes in Lebanon?',
